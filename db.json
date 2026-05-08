@@ -1,0 +1,952 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "name": "Arjun Mehta",
+      "email": "arjun@bridgelabz.com",
+      "role": "MIS_MANAGER",
+      "status": "active",
+      "coeScopeIds": [],
+      "avatar": "AM"
+    },
+    {
+      "id": "u2",
+      "name": "Priya Sharma",
+      "email": "priya@bridgelabz.com",
+      "role": "ACCOUNT_MANAGER",
+      "status": "active",
+      "coeScopeIds": [],
+      "avatar": "PS"
+    },
+    {
+      "id": "u3",
+      "name": "Rohan Verma",
+      "email": "rohan@bridgelabz.com",
+      "role": "COE_LAB_HEAD",
+      "status": "active",
+      "coeScopeIds": [
+        "coe1",
+        "coe2"
+      ],
+      "avatar": "RV"
+    },
+    {
+      "id": "u4",
+      "name": "Sneha Patel",
+      "email": "sneha@bridgelabz.com",
+      "role": "HEAD_OF_ENGINEERING",
+      "status": "active",
+      "coeScopeIds": [],
+      "avatar": "SP"
+    },
+    {
+      "id": "u5",
+      "name": "Kiran Desai",
+      "email": "kiran@bridgelabz.com",
+      "role": "COE_COORDINATOR",
+      "status": "active",
+      "coeScopeIds": [
+        "coe1"
+      ],
+      "avatar": "KD"
+    },
+    {
+      "id": "u6",
+      "name": "Amit Kulkarni",
+      "email": "amit@bridgelabz.com",
+      "role": "COE_LAB_HEAD",
+      "status": "active",
+      "coeScopeIds": [
+        "coe3"
+      ],
+      "avatar": "AK"
+    },
+    {
+      "id": "u7",
+      "name": "Neha Joshi",
+      "email": "neha@bridgelabz.com",
+      "role": "COE_COORDINATOR",
+      "status": "active",
+      "coeScopeIds": [
+        "coe2",
+        "coe3"
+      ],
+      "avatar": "NJ"
+    }
+  ],
+  "coes": [
+    {
+      "id": "coe1",
+      "name": "Mumbai Institute of Technology",
+      "location": "Mumbai",
+      "spoc": "Dr. Ramesh Iyer",
+      "studentsCount": 340
+    },
+    {
+      "id": "coe2",
+      "name": "Pune Engineering College",
+      "location": "Pune",
+      "spoc": "Prof. Anita Rao",
+      "studentsCount": 280
+    },
+    {
+      "id": "coe3",
+      "name": "Bangalore Tech University",
+      "location": "Bangalore",
+      "spoc": "Dr. Suresh Kumar",
+      "studentsCount": 420
+    },
+    {
+      "id": "coe4",
+      "name": "Hyderabad Institute of Science",
+      "location": "Hyderabad",
+      "spoc": "Prof. Lakshmi Reddy",
+      "studentsCount": 310
+    }
+  ],
+  "clients": [
+    {
+      "id": "cl1",
+      "name": "Apexon",
+      "tags": [
+        "fintech",
+        "enterprise"
+      ],
+      "accountOwner": "u2",
+      "shortCode": "Apexon"
+    },
+    {
+      "id": "cl2",
+      "name": "TechMahindra",
+      "tags": [
+        "telecom",
+        "it-services"
+      ],
+      "accountOwner": "u2",
+      "shortCode": "TechM"
+    },
+    {
+      "id": "cl3",
+      "name": "Infosys BPM",
+      "tags": [
+        "bpo",
+        "enterprise"
+      ],
+      "accountOwner": "u2",
+      "shortCode": "InfyBPM"
+    },
+    {
+      "id": "cl4",
+      "name": "Wipro Digital",
+      "tags": [
+        "digital",
+        "cloud"
+      ],
+      "accountOwner": "u2",
+      "shortCode": "Wipro"
+    }
+  ],
+  "mandates": [
+    {
+      "id": "m1",
+      "clientId": "cl1",
+      "mandateName": "Apexon Q1 2025 Fresher Drive",
+      "mandateType": "NEW",
+      "contractRef": "APX-2025-001",
+      "startDate": "2025-01-15",
+      "onboardingDate": "2025-04-01",
+      "locations": [
+        "Mumbai",
+        "Pune"
+      ],
+      "notes": "Priority mandate for DotNet and Java stack",
+      "status": "active",
+      "createdAt": "2025-01-10T09:00:00Z",
+      "createdBy": "u2"
+    },
+    {
+      "id": "m2",
+      "clientId": "cl2",
+      "mandateName": "TechM Cloud Fresher Batch",
+      "mandateType": "NEW",
+      "contractRef": "TM-2025-012",
+      "startDate": "2025-02-01",
+      "onboardingDate": "2025-05-15",
+      "locations": [
+        "Bangalore",
+        "Hyderabad"
+      ],
+      "notes": "Cloud + DevOps stack emphasis",
+      "status": "active",
+      "createdAt": "2025-01-28T10:30:00Z",
+      "createdBy": "u2"
+    },
+    {
+      "id": "m3",
+      "clientId": "cl3",
+      "mandateName": "Infosys BPM Analytics Cohort",
+      "mandateType": "EXPANSION",
+      "contractRef": "IBPM-2025-007",
+      "startDate": "2025-03-01",
+      "onboardingDate": "2025-06-01",
+      "locations": [
+        "Hyderabad",
+        "Bangalore"
+      ],
+      "notes": "Data Engineering & Analytics focus",
+      "status": "draft",
+      "createdAt": "2025-02-15T14:00:00Z",
+      "createdBy": "u2"
+    },
+    {
+      "id": "m4",
+      "clientId": "cl4",
+      "mandateName": "Wipro Digital FY26 Q1",
+      "mandateType": "NEW",
+      "contractRef": "WD-2026-001",
+      "startDate": "2025-04-01",
+      "onboardingDate": "2025-07-01",
+      "locations": [
+        "Mumbai",
+        "Bangalore"
+      ],
+      "notes": "Full-stack + React specialists",
+      "status": "active",
+      "createdAt": "2025-03-10T11:00:00Z",
+      "createdBy": "u2"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "mandateId": "m1",
+      "requirementCode": "Apexon-NEW-DotNetStack-FresherISA-Nov05-861",
+      "techStack": "DotNet",
+      "intakeType": "Fresher ISA",
+      "expLevel": "Fresher",
+      "location": "Mumbai",
+      "onboardingDate": "2025-04-01",
+      "openPositions": 15,
+      "filledPositions": 8,
+      "status": "active",
+      "targetCoeIds": [
+        "coe1",
+        "coe2"
+      ],
+      "createdAt": "2025-01-15T10:00:00Z"
+    },
+    {
+      "id": "r2",
+      "mandateId": "m1",
+      "requirementCode": "Apexon-NEW-JavaStack-FresherISA-Nov05-862",
+      "techStack": "Java",
+      "intakeType": "Fresher ISA",
+      "expLevel": "Fresher",
+      "location": "Pune",
+      "onboardingDate": "2025-04-01",
+      "openPositions": 20,
+      "filledPositions": 14,
+      "status": "active",
+      "targetCoeIds": [
+        "coe1",
+        "coe2",
+        "coe3"
+      ],
+      "createdAt": "2025-01-15T10:05:00Z"
+    },
+    {
+      "id": "r3",
+      "mandateId": "m2",
+      "requirementCode": "TechM-NEW-CloudStack-FresherISA-Feb01-221",
+      "techStack": "Cloud & DevOps",
+      "intakeType": "Fresher ISA",
+      "expLevel": "Fresher",
+      "location": "Bangalore",
+      "onboardingDate": "2025-05-15",
+      "openPositions": 25,
+      "filledPositions": 10,
+      "status": "active",
+      "targetCoeIds": [
+        "coe3"
+      ],
+      "createdAt": "2025-02-01T09:00:00Z"
+    },
+    {
+      "id": "r4",
+      "mandateId": "m2",
+      "requirementCode": "TechM-NEW-ReactStack-FresherISA-Feb01-222",
+      "techStack": "React & Frontend",
+      "intakeType": "Fresher ISA",
+      "expLevel": "Fresher",
+      "location": "Hyderabad",
+      "onboardingDate": "2025-05-15",
+      "openPositions": 12,
+      "filledPositions": 5,
+      "status": "active",
+      "targetCoeIds": [
+        "coe3",
+        "coe4"
+      ],
+      "createdAt": "2025-02-01T09:10:00Z"
+    },
+    {
+      "id": "r5",
+      "mandateId": "m3",
+      "requirementCode": "InfyBPM-EXPANSION-DataEng-FresherISA-Mar01-331",
+      "techStack": "Data Engineering",
+      "intakeType": "Fresher ISA",
+      "expLevel": "Fresher",
+      "location": "Hyderabad",
+      "onboardingDate": "2025-06-01",
+      "openPositions": 18,
+      "filledPositions": 0,
+      "status": "draft",
+      "targetCoeIds": [
+        "coe4"
+      ],
+      "createdAt": "2025-03-01T11:00:00Z"
+    },
+    {
+      "id": "r6",
+      "mandateId": "m4",
+      "requirementCode": "Wipro-NEW-FullStack-FresherISA-Apr01-441",
+      "techStack": "Full Stack",
+      "intakeType": "Fresher ISA",
+      "expLevel": "Fresher",
+      "location": "Mumbai",
+      "onboardingDate": "2025-07-01",
+      "openPositions": 30,
+      "filledPositions": 12,
+      "status": "active",
+      "targetCoeIds": [
+        "coe1",
+        "coe2",
+        "coe3"
+      ],
+      "createdAt": "2025-04-01T08:00:00Z"
+    }
+  ],
+  "hiringDrives": [
+    {
+      "id": "hd1",
+      "coeId": "coe1",
+      "driveName": "MIT Spring 2025 Drive",
+      "date": "2025-02-10",
+      "venue": "MIT Main Campus, Hall A",
+      "techCovered": [
+        "DotNet",
+        "Java"
+      ],
+      "coordinatorId": "u5",
+      "notes": "Total 80 students expected",
+      "status": "completed",
+      "createdAt": "2025-01-20T09:00:00Z"
+    },
+    {
+      "id": "hd2",
+      "coeId": "coe2",
+      "driveName": "PEC Feb Tech Drive",
+      "date": "2025-02-15",
+      "venue": "PEC Conference Center",
+      "techCovered": [
+        "Java",
+        "React & Frontend"
+      ],
+      "coordinatorId": "u7",
+      "notes": "Focus on CS and IT branches",
+      "status": "completed",
+      "createdAt": "2025-01-25T10:00:00Z"
+    },
+    {
+      "id": "hd3",
+      "coeId": "coe3",
+      "driveName": "BTU Cloud Drive",
+      "date": "2025-03-05",
+      "venue": "BTU Innovation Hub",
+      "techCovered": [
+        "Cloud & DevOps",
+        "Full Stack"
+      ],
+      "coordinatorId": "u7",
+      "notes": "Strong pipeline expected",
+      "status": "completed",
+      "createdAt": "2025-02-10T09:00:00Z"
+    },
+    {
+      "id": "hd4",
+      "coeId": "coe1",
+      "driveName": "MIT Summer 2025 Drive",
+      "date": "2025-05-20",
+      "venue": "MIT Main Campus, Hall B",
+      "techCovered": [
+        "Full Stack",
+        "DotNet"
+      ],
+      "coordinatorId": "u5",
+      "notes": "Summer batch preparation",
+      "status": "planned",
+      "createdAt": "2025-04-15T09:00:00Z"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "c1",
+      "coeId": "coe1",
+      "name": "Aarav Singhh",
+      "email": "aarav.singh@mit.edu",
+      "phone": "9876543210",
+      "graduationYear": 2025,
+      "stream": "Computer Science",
+      "skills": [
+        "Java",
+        "Spring Boot",
+        "MySQL"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 82,
+      "status": "Mapped",
+      "externalKey": "MIT-2025-001",
+      "createdAt": "2025-02-10T11:00:00Z"
+    },
+    {
+      "id": "c2",
+      "coeId": "coe1",
+      "name": "Diya Kapoor",
+      "email": "diya.kapoor@mit.edu",
+      "phone": "9876543211",
+      "graduationYear": 2025,
+      "stream": "Information Technology",
+      "skills": [
+        "DotNet",
+        "C#",
+        "SQL Server"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 78,
+      "status": "LOI Sent",
+      "externalKey": "MIT-2025-002",
+      "createdAt": "2025-02-10T11:05:00Z"
+    },
+    {
+      "id": "c3",
+      "coeId": "coe1",
+      "name": "Vikram Nair",
+      "email": "vikram.nair@mit.edu",
+      "phone": "9876543212",
+      "graduationYear": 2025,
+      "stream": "Computer Science",
+      "skills": [
+        "React",
+        "JavaScript",
+        "Node.js"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 91,
+      "status": "LOI Signed",
+      "externalKey": "MIT-2025-003",
+      "createdAt": "2025-02-10T11:10:00Z"
+    },
+    {
+      "id": "c4",
+      "coeId": "coe1",
+      "name": "Meera Pillai",
+      "email": "meera.pillai@mit.edu",
+      "phone": "9876543213",
+      "graduationYear": 2025,
+      "stream": "Electronics",
+      "skills": [
+        "Python",
+        "Data Science"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 75,
+      "status": "Selected",
+      "externalKey": "MIT-2025-004",
+      "createdAt": "2025-02-10T11:15:00Z"
+    },
+    {
+      "id": "c5",
+      "coeId": "coe2",
+      "name": "Rahul Gupta",
+      "email": "rahul.gupta@pec.edu",
+      "phone": "9876543220",
+      "graduationYear": 2025,
+      "stream": "Computer Science",
+      "skills": [
+        "Java",
+        "Microservices",
+        "Docker"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 88,
+      "status": "Proposed",
+      "externalKey": "PEC-2025-001",
+      "createdAt": "2025-02-15T10:00:00Z"
+    },
+    {
+      "id": "c6",
+      "coeId": "coe2",
+      "name": "Anjali Sharma",
+      "email": "anjali.sharma@pec.edu",
+      "phone": "9876543221",
+      "graduationYear": 2025,
+      "stream": "Information Technology",
+      "skills": [
+        "DotNet",
+        "Azure",
+        "REST APIs"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 85,
+      "status": "Mapped",
+      "externalKey": "PEC-2025-002",
+      "createdAt": "2025-02-15T10:05:00Z"
+    },
+    {
+      "id": "c7",
+      "coeId": "coe3",
+      "name": "Suraj Kumar",
+      "email": "suraj.kumar@btu.edu",
+      "phone": "9876543230",
+      "graduationYear": 2025,
+      "stream": "Computer Science",
+      "skills": [
+        "AWS",
+        "Kubernetes",
+        "Terraform"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 93,
+      "status": "CFP Started",
+      "externalKey": "BTU-2025-001",
+      "createdAt": "2025-03-05T09:30:00Z"
+    },
+    {
+      "id": "c8",
+      "coeId": "coe3",
+      "name": "Pooja Reddy",
+      "email": "pooja.reddy@btu.edu",
+      "phone": "9876543231",
+      "graduationYear": 2025,
+      "stream": "Information Technology",
+      "skills": [
+        "React",
+        "TypeScript",
+        "GraphQL"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 87,
+      "status": "LOI Sent",
+      "externalKey": "BTU-2025-002",
+      "createdAt": "2025-03-05T09:35:00Z"
+    },
+    {
+      "id": "c9",
+      "coeId": "coe3",
+      "name": "Nikhil Jain",
+      "email": "nikhil.jain@btu.edu",
+      "phone": "9876543232",
+      "graduationYear": 2025,
+      "stream": "Computer Engineering",
+      "skills": [
+        "Full Stack",
+        "Node.js",
+        "MongoDB"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 79,
+      "status": "Discussed",
+      "externalKey": "BTU-2025-003",
+      "createdAt": "2025-03-05T09:40:00Z"
+    },
+    {
+      "id": "c10",
+      "coeId": "coe1",
+      "name": "Tanvi Shah",
+      "email": "tanvi.shah@mit.edu",
+      "phone": "9876543214",
+      "graduationYear": 2025,
+      "stream": "Computer Science",
+      "skills": [
+        "Java",
+        "Spring",
+        "Hibernate"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 83,
+      "status": "Selected",
+      "externalKey": "MIT-2025-005",
+      "createdAt": "2025-02-10T11:20:00Z"
+    },
+    {
+      "id": "c11",
+      "coeId": "coe2",
+      "name": "Aditya Rane",
+      "email": "aditya.rane@pec.edu",
+      "phone": "9876543222",
+      "graduationYear": 2025,
+      "stream": "Computer Science",
+      "skills": [
+        "React",
+        "Vue.js",
+        "CSS"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 76,
+      "status": "Proposed",
+      "externalKey": "PEC-2025-003",
+      "createdAt": "2025-02-15T10:10:00Z"
+    },
+    {
+      "id": "c12",
+      "coeId": "coe4",
+      "name": "Lakshmi Naidu",
+      "email": "lakshmi.naidu@his.edu",
+      "phone": "9876543240",
+      "graduationYear": 2025,
+      "stream": "Data Science",
+      "skills": [
+        "Python",
+        "Spark",
+        "Hadoop"
+      ],
+      "resumeLink": "",
+      "assessmentScore": 90,
+      "status": "Selected",
+      "externalKey": "HIS-2025-001",
+      "createdAt": "2025-03-15T10:00:00Z"
+    }
+  ],
+  "mappings": [
+    {
+      "id": "mp1",
+      "requirementId": "r1",
+      "status": "Confirmed by MIS",
+      "createdBy": "u3",
+      "currentOwnerRole": "COE_COORDINATOR",
+      "notes": "Strong DotNet candidates from MIT",
+      "createdAt": "2025-02-20T10:00:00Z",
+      "updatedAt": "2025-03-01T14:00:00Z"
+    },
+    {
+      "id": "mp2",
+      "requirementId": "r2",
+      "status": "Confirmed by MIS",
+      "createdBy": "u3",
+      "currentOwnerRole": "HEAD_OF_ENGINEERING",
+      "notes": "Mixed COE mapping for Java stack",
+      "createdAt": "2025-02-22T11:00:00Z",
+      "updatedAt": "2026-05-08T06:41:59.134Z"
+    },
+    {
+      "id": "mp3",
+      "requirementId": "r3",
+      "status": "LOI Issued",
+      "createdBy": "u6",
+      "currentOwnerRole": "COE_LAB_HEAD",
+      "notes": "BTU cloud specialists mapped",
+      "createdAt": "2025-03-10T09:00:00Z",
+      "updatedAt": "2025-03-20T15:00:00Z"
+    },
+    {
+      "id": "mp4",
+      "requirementId": "r6",
+      "status": "Submitted",
+      "createdBy": "u3",
+      "currentOwnerRole": "COE_LAB_HEAD",
+      "notes": "Initial full-stack mapping proposal",
+      "createdAt": "2025-04-05T10:00:00Z",
+      "updatedAt": "2026-05-08T06:42:01.569Z"
+    }
+  ],
+  "mappingLineItems": [
+    {
+      "id": "mli1",
+      "mappingId": "mp1",
+      "candidateId": "c2",
+      "proposedTech": "DotNet",
+      "allocationType": "Primary"
+    },
+    {
+      "id": "mli2",
+      "mappingId": "mp1",
+      "candidateId": "c6",
+      "proposedTech": "DotNet",
+      "allocationType": "Primary"
+    },
+    {
+      "id": "mli3",
+      "mappingId": "mp2",
+      "candidateId": "c1",
+      "proposedTech": "Java",
+      "allocationType": "Primary"
+    },
+    {
+      "id": "mli4",
+      "mappingId": "mp2",
+      "candidateId": "c5",
+      "proposedTech": "Java",
+      "allocationType": "Primary"
+    },
+    {
+      "id": "mli5",
+      "mappingId": "mp2",
+      "candidateId": "c10",
+      "proposedTech": "Java",
+      "allocationType": "Secondary"
+    },
+    {
+      "id": "mli6",
+      "mappingId": "mp3",
+      "candidateId": "c7",
+      "proposedTech": "Cloud & DevOps",
+      "allocationType": "Primary"
+    },
+    {
+      "id": "mli7",
+      "mappingId": "mp3",
+      "candidateId": "c8",
+      "proposedTech": "Cloud & DevOps",
+      "allocationType": "Primary"
+    },
+    {
+      "id": "mli8",
+      "mappingId": "mp4",
+      "candidateId": "c3",
+      "proposedTech": "Full Stack",
+      "allocationType": "Primary"
+    },
+    {
+      "id": "mli9",
+      "mappingId": "mp4",
+      "candidateId": "c9",
+      "proposedTech": "Full Stack",
+      "allocationType": "Primary"
+    }
+  ],
+  "approvals": [
+    {
+      "id": "ap1",
+      "mappingId": "mp1",
+      "actorRole": "HEAD_OF_ENGINEERING",
+      "actorId": "u4",
+      "decision": "Approved",
+      "comment": "Good alignment with DotNet requirements",
+      "timestamp": "2025-02-25T11:00:00Z"
+    },
+    {
+      "id": "ap2",
+      "mappingId": "mp1",
+      "actorRole": "MIS_MANAGER",
+      "actorId": "u1",
+      "decision": "Approved",
+      "comment": "Confirmed. Proceed to COE discussion.",
+      "timestamp": "2025-03-01T14:00:00Z"
+    },
+    {
+      "id": "ap3",
+      "mappingId": "mp2",
+      "actorRole": "HEAD_OF_ENGINEERING",
+      "actorId": "u4",
+      "decision": "Pending",
+      "comment": "",
+      "timestamp": "2025-02-25T09:00:00Z"
+    },
+    {
+      "id": "nrtxv8h5",
+      "mappingId": "mp2",
+      "actorRole": "MIS_MANAGER",
+      "actorId": "u1",
+      "decision": "Approved",
+      "comment": "",
+      "timestamp": "2026-05-08T06:41:46.058Z"
+    }
+  ],
+  "discussionLogs": [
+    {
+      "id": "dl1",
+      "mappingLineItemId": "mli1",
+      "coordinatorId": "u5",
+      "outcome": "Interested",
+      "notes": "Candidate confirmed availability for April onboarding",
+      "followUpDate": "2025-03-10",
+      "createdAt": "2025-03-05T10:00:00Z"
+    },
+    {
+      "id": "dl2",
+      "mappingLineItemId": "mli2",
+      "coordinatorId": "u5",
+      "outcome": "Interested",
+      "notes": "Very enthusiastic, signed LOI on time",
+      "followUpDate": null,
+      "createdAt": "2025-03-05T10:30:00Z"
+    },
+    {
+      "id": "dl3",
+      "mappingLineItemId": "mli6",
+      "coordinatorId": "u7",
+      "outcome": "Interested",
+      "notes": "CFP started, candidate onboarded",
+      "followUpDate": null,
+      "createdAt": "2025-03-22T09:00:00Z"
+    }
+  ],
+  "lois": [
+    {
+      "id": "loi1",
+      "candidateId": "c2",
+      "requirementId": "r1",
+      "mappingId": "mp1",
+      "sentAt": "2025-03-08T09:00:00Z",
+      "signedAt": "2026-05-08T06:41:31.223Z",
+      "documentUrl": "",
+      "status": "Signed"
+    },
+    {
+      "id": "loi2",
+      "candidateId": "c6",
+      "requirementId": "r1",
+      "mappingId": "mp1",
+      "sentAt": "2025-03-08T09:05:00Z",
+      "signedAt": "2025-03-10T14:00:00Z",
+      "documentUrl": "",
+      "status": "Signed"
+    },
+    {
+      "id": "loi3",
+      "candidateId": "c7",
+      "requirementId": "r3",
+      "mappingId": "mp3",
+      "sentAt": "2025-03-20T10:00:00Z",
+      "signedAt": "2025-03-22T11:00:00Z",
+      "documentUrl": "",
+      "status": "Signed"
+    },
+    {
+      "id": "loi4",
+      "candidateId": "c8",
+      "requirementId": "r3",
+      "mappingId": "mp3",
+      "sentAt": "2025-03-20T10:10:00Z",
+      "signedAt": "2026-05-08T06:41:32.609Z",
+      "documentUrl": "",
+      "status": "Signed"
+    },
+    {
+      "id": "htoo01ty",
+      "candidateId": "c1",
+      "requirementId": "r6",
+      "mappingId": "mp4",
+      "sentAt": "2026-05-08T06:29:50.361Z",
+      "signedAt": "2026-05-08T06:41:36.208Z",
+      "documentUrl": "",
+      "status": "Signed"
+    }
+  ],
+  "cfpEnrollments": [
+    {
+      "id": "cfp1",
+      "candidateId": "c7",
+      "coeId": "coe3",
+      "requirementId": "r3",
+      "startedAt": "2025-04-01T09:00:00Z",
+      "status": "Active"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "n1",
+      "userId": "u4",
+      "type": "MAPPING_SUBMITTED",
+      "message": "New mapping proposal submitted for Apexon-NEW-JavaStack-FresherISA-Nov05-862 awaiting your review.",
+      "read": false,
+      "createdAt": "2025-02-22T11:00:00Z",
+      "linkTo": "/mappings/mp2"
+    },
+    {
+      "id": "n2",
+      "userId": "u1",
+      "type": "ENGINEERING_APPROVED",
+      "message": "Head of Engineering approved mapping for Apexon-NEW-DotNetStack-FresherISA-Nov05-861. Awaiting your confirmation.",
+      "read": false,
+      "createdAt": "2025-02-25T11:00:00Z",
+      "linkTo": "/mappings/mp1"
+    },
+    {
+      "id": "n3",
+      "userId": "u5",
+      "type": "MAPPING_CONFIRMED",
+      "message": "Mapping confirmed by MIS Manager. Please initiate candidate discussions for mp1.",
+      "read": true,
+      "createdAt": "2025-03-01T14:00:00Z",
+      "linkTo": "/mappings/mp1"
+    },
+    {
+      "id": "n4",
+      "userId": "u3",
+      "type": "LOI_SIGNED",
+      "message": "Anjali Sharma has signed the LOI for Apexon-NEW-DotNetStack-FresherISA-Nov05-861.",
+      "read": false,
+      "createdAt": "2025-03-10T14:00:00Z",
+      "linkTo": "/loi"
+    }
+  ],
+  "auditEvents": [
+    {
+      "id": "ae1",
+      "entityType": "Mapping",
+      "entityId": "mp1",
+      "action": "STATUS_CHANGE",
+      "actorId": "u3",
+      "before": {
+        "status": "Draft"
+      },
+      "after": {
+        "status": "Submitted"
+      },
+      "timestamp": "2025-02-20T10:00:00Z"
+    },
+    {
+      "id": "ae2",
+      "entityType": "Mapping",
+      "entityId": "mp1",
+      "action": "STATUS_CHANGE",
+      "actorId": "u4",
+      "before": {
+        "status": "Engineering Review"
+      },
+      "after": {
+        "status": "Approved by Eng"
+      },
+      "timestamp": "2025-02-25T11:00:00Z"
+    },
+    {
+      "id": "ae3",
+      "entityType": "Mapping",
+      "entityId": "mp1",
+      "action": "STATUS_CHANGE",
+      "actorId": "u1",
+      "before": {
+        "status": "Approved by Eng"
+      },
+      "after": {
+        "status": "Confirmed by MIS"
+      },
+      "timestamp": "2025-03-01T14:00:00Z"
+    },
+    {
+      "id": "ae4",
+      "entityType": "LOI",
+      "entityId": "loi2",
+      "action": "STATUS_CHANGE",
+      "actorId": "u3",
+      "before": {
+        "status": "Sent"
+      },
+      "after": {
+        "status": "Signed"
+      },
+      "timestamp": "2025-03-10T14:00:00Z"
+    }
+  ]
+}
