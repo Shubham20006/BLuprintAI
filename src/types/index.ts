@@ -32,14 +32,13 @@ export type MappingStatus =
   | 'CFP Started';
 
 export type DiscussionOutcome =
-  | 'Interested'
-  | 'Not Interested'
-  | 'Need Time'
-  | 'Unreachable';
+  | 'Accepted'
+  | 'Declined'
+  | 'Reschedule';
 
 export type LOIStatus = 'Sent' | 'Signed' | 'Acknowledged' | 'Pending';
 
-export type ApprovalDecision = 'Approved' | 'Rejected' | 'Pending';
+export type ApprovalDecision = 'Approved' | 'Rejected' | 'Pending' | 'Revision Requested';
 
 export type DriveStatus = 'planned' | 'completed' | 'cancelled';
 
@@ -138,6 +137,7 @@ export interface Candidate {
   status: CandidateStatus;
   externalKey: string;
   availabilityDate: string;
+  avatar: string;
   createdAt: string;
 }
 
