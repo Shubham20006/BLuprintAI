@@ -15,6 +15,10 @@ export const LoginPage: React.FC = () => {
 
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!Array.isArray(users)) {
+      setError('System error: User data is not available.');
+      return;
+    }
     const user = users.find(u => u.email === email);
     if (user) {
       setCurrentUser(user);
