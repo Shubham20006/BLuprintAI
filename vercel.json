@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/index.cjs": {
-      "includeFiles": "db.json"
-    }
-  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.cjs" },
     { "source": "/(.*)", "destination": "/index.html" }
