@@ -12,7 +12,7 @@ interface ThemeSlice {
 export const useThemeStore = create<ThemeSlice>()(
   persist(
     (set) => ({
-      mode: 'dark',
+      mode: 'light',
       toggleMode: () =>
         set((s) => ({ mode: s.mode === 'dark' ? 'light' : 'dark' })),
     }),

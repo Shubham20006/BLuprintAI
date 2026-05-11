@@ -1,10 +1,4 @@
 import React from 'react';
-import {
-  Box, Button, Typography, Table, TableBody, TableCell,
-  TableHead, TableRow, Dialog, DialogTitle, DialogContent,
-  DialogActions, TextField, MenuItem, Grid, Chip, IconButton,
-} from '@mui/material';
-import { Add, Edit } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,8 +6,7 @@ import { useSnackbar } from 'notistack';
 import { useHiringDrives, useCOEs, useCreateHiringDrive } from '../../api/hooks';
 import { useSessionStore } from '../../store';
 import { can } from '../../auth/permissions';
-import { PageHeader, SectionCard, StatusChip } from '../../components/shared';
-import { formatDate, generateId, TECH_STACKS } from '../../utils';
+import { generateId } from '../../utils';
 
 const schema = z.object({
   coeId: z.string().min(1, 'Required'),
@@ -64,114 +57,147 @@ export const HiringDrivesPage: React.FC = () => {
   const canCreate = currentUser && can.createHiringDrive(currentUser.role);
 
   return (
-    <Box>
-      <PageHeader
-        title="Hiring Drives"
-        subtitle={`${scopedDrives.length} drives`}
-        action={canCreate && (
-          <Button variant="contained" startIcon={<Add />} onClick={() => { reset(); setOpen(true); }}>
-            New Drive
-          </Button>
-        )}
-      />
+    <>
+      <div className="topbar">
+        <div className="topbar-left">
+          <span className="breadcrumb">Hiring Drives / <span>{scopedDrives.length} drives</span></span>
+        </div>
+        <div className="topbar-right">
+          {canCreate && (
+            <button className="btn btn-primary btn-sm" onClick={() => { reset(); setOpen(true); }}>
+              <i className="ti ti-plus" aria-hidden="true" /> New Drive
+            </button>
+          )}
+        </div>
+      </div>
 
-      <SectionCard>
-        <Box sx={{ overflowX: 'auto' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Drive Name</TableCell>
-                <TableCell>COE</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Venue</TableCell>
-                <TableCell>Tech Covered</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {scopedDrives.map((d) => {
-                const coe = coes.find((c) => c.id === d.coeId);
-                return (
-                  <TableRow key={d.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={600}>{d.driveName}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{coe?.name.split(' ').slice(0, 2).join(' ')}</Typography>
-                    </TableCell>
-                    <TableCell><Typography variant="body2">{formatDate(d.date)}</Typography></TableCell>
-                    <TableCell>
-                      <Typography variant="caption" color="text.secondary">{d.venue}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                        {d.techCovered.map((t) => (
-                          <Chip key={t} label={t} size="small" sx={{ fontSize: '0.6rem', height: 18 }} />
-                        ))}
-                      </Box>
-                    </TableCell>
-                    <TableCell><StatusChip status={d.status} type="drive" /></TableCell>
-                  </TableRow>
-                );
-              })}
-              {scopedDrives.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">No drives found</Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Box>
-      </SectionCard>
+      <div className="content">
+        <div className="panel">
+          <div className="panel-hd">
+            <span className="panel-title">Active Hiring Drives</span>
+            <div style={{ display: 'flex', gap: 8 }}>
+               <button className="btn btn-ghost btn-sm"><i className="ti ti-download" aria-hidden="true" /> Export</button>
+            </div>
+          </div>
+          <div style={{ padding: 0 }}>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Drive Name</th>
+                  <th>COE</th>
+                  <th>Date</th>
+                  <th>Venue</th>
+                  <th>Tech Covered</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scopedDrives.map((d) => {
+                  const coe = coes.find((c) => c.id === d.coeId);
+                  return (
+                    <tr key={d.id}>
+                      <td>
+                        <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{d.driveName}</div>
+                      </td>
+                      <td>{coe?.name.split(' ').slice(0, 2).join(' ')}</td>
+                      <td>{new Date(d.date).toLocaleDateString()}</td>
+                      <td style={{ color: 'var(--g500)', fontSize: 11 }}>{d.venue}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          {d.techCovered.map((t) => (
+                            <span key={t} className="badge loi" style={{ fontSize: 10, padding: '2px 6px' }}>{t}</span>
+                          ))}
+                        </div>
+                      </td>
+                      <td><span className={`badge ${d.status === 'planned' ? 'active' : 'draft'}`}>{d.status}</span></td>
+                    </tr>
+                  );
+                })}
+                {scopedDrives.length === 0 && (
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: 'center', padding: '40px 0', color: 'var(--g500)' }}>
+                      No drives found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-      {/* Create Dialog */}
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Create Hiring Drive</DialogTitle>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent>
-            <Grid container spacing={2} pt={1}>
-              <Grid item xs={12}>
-                <Controller name="driveName" control={control} render={({ field }) => (
-                  <TextField {...field} label="Drive Name" fullWidth error={!!errors.driveName} helperText={errors.driveName?.message} />
-                )} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller name="coeId" control={control} render={({ field }) => (
-                  <TextField {...field} label="COE" select fullWidth error={!!errors.coeId} helperText={errors.coeId?.message}>
-                    {coes.map((c) => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
-                  </TextField>
-                )} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller name="date" control={control} render={({ field }) => (
-                  <TextField {...field} label="Drive Date" type="date" fullWidth InputLabelProps={{ shrink: true }} error={!!errors.date} helperText={errors.date?.message} />
-                )} />
-              </Grid>
-              <Grid item xs={12}>
-                <Controller name="venue" control={control} render={({ field }) => (
-                  <TextField {...field} label="Venue" fullWidth error={!!errors.venue} helperText={errors.venue?.message} />
-                )} />
-              </Grid>
-              <Grid item xs={12}>
-                <Controller name="techCovered" control={control} render={({ field }) => (
-                  <TextField {...field} label="Tech Covered (comma separated)" fullWidth error={!!errors.techCovered} helperText={errors.techCovered?.message || 'e.g. Java, DotNet'} />
-                )} />
-              </Grid>
-              <Grid item xs={12}>
-                <Controller name="notes" control={control} render={({ field }) => (
-                  <TextField {...field} label="Notes" fullWidth multiline rows={2} />
-                )} />
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="contained" disabled={isPending}>Create Drive</Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </Box>
+      {open && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: 500 }}>
+            <div className="modal-hd">
+              <span className="modal-title">Create Hiring Drive</span>
+              <button className="btn-close" onClick={() => setOpen(false)}>×</button>
+            </div>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="modal-body">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
+                  <div>
+                    <label className="form-label">Drive Name</label>
+                    <Controller name="driveName" control={control} render={({ field }) => (
+                      <input {...field} className={`form-input ${errors.driveName ? 'error' : ''}`} placeholder="e.g. Pune Tech Drive 2025" />
+                    )} />
+                    {errors.driveName && <span className="error-text">{errors.driveName.message}</span>}
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <div>
+                      <label className="form-label">COE</label>
+                      <Controller name="coeId" control={control} render={({ field }) => (
+                        <select {...field} className={`form-select ${errors.coeId ? 'error' : ''}`}>
+                          <option value="">Select COE</option>
+                          {coes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        </select>
+                      )} />
+                      {errors.coeId && <span className="error-text">{errors.coeId.message}</span>}
+                    </div>
+                    <div>
+                      <label className="form-label">Drive Date</label>
+                      <Controller name="date" control={control} render={({ field }) => (
+                        <input {...field} type="date" className={`form-input ${errors.date ? 'error' : ''}`} />
+                      )} />
+                      {errors.date && <span className="error-text">{errors.date.message}</span>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="form-label">Venue</label>
+                    <Controller name="venue" control={control} render={({ field }) => (
+                      <input {...field} className={`form-input ${errors.venue ? 'error' : ''}`} placeholder="e.g. Pune Lab, Block A" />
+                    )} />
+                    {errors.venue && <span className="error-text">{errors.venue.message}</span>}
+                  </div>
+
+                  <div>
+                    <label className="form-label">Tech Covered (comma separated)</label>
+                    <Controller name="techCovered" control={control} render={({ field }) => (
+                      <input {...field} className={`form-input ${errors.techCovered ? 'error' : ''}`} placeholder="e.g. Java, Python, React" />
+                    )} />
+                    {errors.techCovered && <span className="error-text">{errors.techCovered.message}</span>}
+                  </div>
+
+                  <div>
+                    <label className="form-label">Notes</label>
+                    <Controller name="notes" control={control} render={({ field }) => (
+                      <textarea {...field} className="form-input" style={{ minHeight: 80 }} placeholder="Any special instructions..." />
+                    )} />
+                  </div>
+                </div>
+              </div>
+              <div className="modal-ft">
+                <button type="button" className="btn btn-ghost" onClick={() => setOpen(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={isPending}>
+                  {isPending ? 'Creating...' : 'Create Drive'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 };

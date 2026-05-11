@@ -1,11 +1,4 @@
 import React from 'react';
-import {
-  Box, Button, Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, MenuItem, Grid, Typography, Chip, IconButton,
-  Table, TableBody, TableCell, TableHead, TableRow, InputAdornment,
-  Avatar,
-} from '@mui/material';
-import { Add, Search, Edit, Visibility, Upload, FilterList } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,8 +6,7 @@ import { useSnackbar } from 'notistack';
 import { useCandidates, useCOEs, useCreateCandidate, useUpdateCandidate } from '../../api/hooks';
 import { useSessionStore } from '../../store';
 import { can } from '../../auth/permissions';
-import { StatusChip, PageHeader, SectionCard, RoleBadge } from '../../components/shared';
-import { formatDate, generateId, TECH_STACKS, exportToCSV } from '../../utils';
+import { generateId, exportToCSV } from '../../utils';
 import type { Candidate } from '../../types';
 
 const schema = z.object({
@@ -50,7 +42,47 @@ export const CandidatesPage: React.FC = () => {
     defaultValues: { name: '', email: '', phone: '', coeId: '', graduationYear: 2025, stream: '', skills: '', assessmentScore: 75 },
   });
 
-  // COE scope filter
+  const [importOpen, setImportOpen] = React.useState(false);
+  const [csvData, setCsvData] = React.useState('');
+  const [importing, setImporting] = React.useState(false);
+
+  const handleCsvImport = async () => {
+    if (!csvData.trim()) return;
+    setImporting(true);
+    try {
+      const lines = csvData.trim().split('\n');
+      let count = 0;
+      for (const line of lines) {
+        const [name, email, phone, coeId, year, stream, skills, score] = line.split(',').map(s => s?.trim());
+        if (!name || !email) continue;
+        
+        await createCandidate({
+          id: generateId(),
+          name,
+          email,
+          phone: phone || '',
+          coeId: coeId || coes[0]?.id || '',
+          graduationYear: parseInt(year) || 2025,
+          stream: stream || 'CS',
+          skills: (skills || '').split(';').map(s => s.trim()),
+          assessmentScore: parseInt(score) || 0,
+          status: 'Selected',
+          resumeLink: '',
+          externalKey: `IMP-${generateId()}`,
+          createdAt: new Date().toISOString(),
+        });
+        count++;
+      }
+      enqueueSnackbar(`Successfully imported ${count} candidates`, { variant: 'success' });
+      setImportOpen(false);
+      setCsvData('');
+    } catch (err) {
+      enqueueSnackbar('Error during import', { variant: 'error' });
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const scopedCandidates = currentUser && can.isCOEScoped(currentUser.role) && currentUser.coeScopeIds.length
     ? candidates.filter((c) => currentUser.coeScopeIds.includes(c.coeId))
     : candidates;
@@ -76,6 +108,17 @@ export const CandidatesPage: React.FC = () => {
 
   const onSubmit = async (data: FormValues) => {
     try {
+      // Duplicate detection
+      const isDuplicate = candidates.some(c => 
+        (c.email.toLowerCase() === data.email.toLowerCase() || c.phone === data.phone) && 
+        c.id !== editing?.id
+      );
+
+      if (isDuplicate) {
+        enqueueSnackbar('Candidate with this email or phone already exists', { variant: 'error' });
+        return;
+      }
+
       const payload: Partial<Candidate> = {
         ...data,
         skills: data.skills.split(',').map((s) => s.trim()).filter(Boolean),
@@ -98,175 +141,229 @@ export const CandidatesPage: React.FC = () => {
   };
 
   return (
-    <Box>
-      <PageHeader
-        title="Candidates"
-        subtitle={`${filtered.length} of ${candidates.length} candidates`}
-        action={
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button variant="outlined" startIcon={<Upload />} size="small"
-              onClick={() => enqueueSnackbar('CSV import — connect backend for file processing', { variant: 'info' })}>
-              Import CSV
-            </Button>
+    <>
+      <div className="topbar">
+        <div className="topbar-left">
+          <span className="breadcrumb">Candidates / <span>{filtered.length} of {candidates.length}</span></span>
+        </div>
+        <div className="topbar-right">
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn btn-ghost btn-sm" onClick={() => setImportOpen(true)}>
+              <i className="ti ti-upload" aria-hidden="true" /> Import CSV
+            </button>
             {currentUser && can.importCandidates(currentUser.role) && (
-              <Button variant="contained" startIcon={<Add />} onClick={() => handleOpen()}>Add Candidate</Button>
+              <button className="btn btn-primary btn-sm" onClick={() => handleOpen()}>
+                <i className="ti ti-plus" aria-hidden="true" /> Add Candidate
+              </button>
             )}
-          </Box>
-        }
-      />
+          </div>
+        </div>
+      </div>
 
-      <SectionCard>
-        <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-          <TextField
-            placeholder="Search by name or email…"
-            value={search} onChange={(e) => setSearch(e.target.value)}
-            InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }}
-            sx={{ flex: 1, minWidth: 200 }}
-          />
-          <TextField
-            select label="Status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-            sx={{ minWidth: 150 }}>
-            <MenuItem value="">All Status</MenuItem>
-            {STATUS_OPTIONS.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
-          </TextField>
-          <TextField
-            select label="COE" value={coeFilter} onChange={(e) => setCoeFilter(e.target.value)}
-            sx={{ minWidth: 160 }}>
-            <MenuItem value="">All COEs</MenuItem>
-            {coes.map((c) => <MenuItem key={c.id} value={c.id}>{c.name.split(' ').slice(0,2).join(' ')}</MenuItem>)}
-          </TextField>
-          <Button variant="outlined" size="small" onClick={() => exportToCSV(filtered.map(c => ({...c, skills: c.skills.join(';')})), 'candidates')}>
-            Export
-          </Button>
-        </Box>
+      <div className="content">
+        <div className="panel">
+          <div className="panel-hd" style={{ padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <i className="ti ti-search" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--g400)' }} aria-hidden="true" />
+              <input 
+                className="form-input" 
+                placeholder="Search by name or email..." 
+                style={{ paddingLeft: 32 }}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <select className="form-select" style={{ width: 140 }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+              <option value="">All Status</option>
+              {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <select className="form-select" style={{ width: 160 }} value={coeFilter} onChange={(e) => setCoeFilter(e.target.value)}>
+              <option value="">All COEs</option>
+              {coes.map(c => <option key={c.id} value={c.id}>{c.name.split(' ')[0]}</option>)}
+            </select>
+            <button className="btn btn-ghost btn-sm" onClick={() => exportToCSV(filtered.map(c => ({...c, skills: c.skills.join(';')})), 'candidates')}>
+              <i className="ti ti-download" aria-hidden="true" /> Export
+            </button>
+          </div>
+          <div style={{ padding: 0 }}>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>COE</th>
+                  <th>Stream</th>
+                  <th>Skills</th>
+                  <th>Score</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((c) => {
+                  const coe = coes.find((co) => co.id === c.coeId);
+                  return (
+                    <tr key={c.id}>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--blue)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600 }}>
+                            {c.name.split(' ').map(w => w[0]).join('').slice(0,2)}
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{c.name}</div>
+                            <div style={{ fontSize: 10, color: 'var(--g500)' }}>{c.email}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span style={{ fontSize: 11 }}>{coe?.name.split(' ')[0] || c.coeId}</span></td>
+                      <td>{c.stream}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', maxWidth: 200 }}>
+                          {c.skills.slice(0, 2).map((s) => (
+                            <span key={s} className="badge mapping" style={{ fontSize: 9 }}>{s}</span>
+                          ))}
+                          {c.skills.length > 2 && <span className="badge mapping" style={{ fontSize: 9 }}>+{c.skills.length - 2}</span>}
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`badge ${c.assessmentScore >= 80 ? 'active' : c.assessmentScore >= 60 ? 'mapping' : 'draft'}`} style={{ fontWeight: 700 }}>
+                          {c.assessmentScore}%
+                        </span>
+                      </td>
+                      <td><span className={`badge ${c.status === 'Selected' ? 'active' : c.status === 'Dropped' ? 'draft' : 'mapping'}`}>{c.status}</span></td>
+                      <td style={{ textAlign: 'right' }}>
+                        <button className="btn btn-ghost btn-sm" onClick={() => handleOpen(c)}>
+                          <i className="ti ti-edit" aria-hidden="true" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {!isLoading && filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: 'center', padding: '40px 0', color: 'var(--g500)' }}>
+                      No candidates found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-        <Box sx={{ overflowX: 'auto' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Candidate</TableCell>
-                <TableCell>COE</TableCell>
-                <TableCell>Stream</TableCell>
-                <TableCell>Skills</TableCell>
-                <TableCell>Score</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filtered.map((c) => {
-                const coe = coes.find((co) => co.id === c.coeId);
-                return (
-                  <TableRow key={c.id} hover>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar sx={{ width: 32, height: 32, fontSize: '0.75rem', bgcolor: 'primary.main' }}>
-                          {c.name.split(' ').map(w => w[0]).join('').slice(0,2)}
-                        </Avatar>
-                        <Box>
-                          <Typography variant="body2" fontWeight={600}>{c.name}</Typography>
-                          <Typography variant="caption" color="text.secondary">{c.email}</Typography>
-                        </Box>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="caption">{coe?.name.split(' ').slice(0,2).join(' ') || c.coeId}</Typography>
-                    </TableCell>
-                    <TableCell><Typography variant="body2">{c.stream}</Typography></TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 200 }}>
-                        {c.skills.slice(0, 3).map((s) => (
-                          <Chip key={s} label={s} size="small" sx={{ fontSize: '0.6rem', height: 18 }} />
-                        ))}
-                        {c.skills.length > 3 && <Chip label={`+${c.skills.length - 3}`} size="small" sx={{ fontSize: '0.6rem', height: 18 }} />}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={`${c.assessmentScore}%`} size="small"
-                        color={c.assessmentScore >= 80 ? 'success' : c.assessmentScore >= 60 ? 'warning' : 'error'}
-                        sx={{ fontWeight: 700 }}
-                      />
-                    </TableCell>
-                    <TableCell><StatusChip status={c.status} type="candidate" /></TableCell>
-                    <TableCell align="right">
-                      <IconButton size="small" onClick={() => handleOpen(c)}>
-                        <Edit fontSize="small" />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              {!isLoading && filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">No candidates found</Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Box>
-      </SectionCard>
+      {open && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: 600 }}>
+            <div className="modal-hd">
+              <span className="modal-title">{editing ? 'Edit Candidate' : 'Add Candidate'}</span>
+              <button className="btn-close" onClick={() => setOpen(false)}>×</button>
+            </div>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="modal-body">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <label className="form-label">Full Name</label>
+                    <Controller name="name" control={control} render={({ field }) => (
+                      <input {...field} className={`form-input ${errors.name ? 'error' : ''}`} />
+                    )} />
+                    {errors.name && <span className="error-text">{errors.name.message}</span>}
+                  </div>
+                  <div>
+                    <label className="form-label">Email</label>
+                    <Controller name="email" control={control} render={({ field }) => (
+                      <input {...field} type="email" className={`form-input ${errors.email ? 'error' : ''}`} />
+                    )} />
+                    {errors.email && <span className="error-text">{errors.email.message}</span>}
+                  </div>
+                  <div>
+                    <label className="form-label">Phone</label>
+                    <Controller name="phone" control={control} render={({ field }) => (
+                      <input {...field} className={`form-input ${errors.phone ? 'error' : ''}`} />
+                    )} />
+                    {errors.phone && <span className="error-text">{errors.phone.message}</span>}
+                  </div>
+                  <div>
+                    <label className="form-label">COE</label>
+                    <Controller name="coeId" control={control} render={({ field }) => (
+                      <select {...field} className={`form-select ${errors.coeId ? 'error' : ''}`}>
+                        <option value="">Select COE</option>
+                        {coes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </select>
+                    )} />
+                    {errors.coeId && <span className="error-text">{errors.coeId.message}</span>}
+                  </div>
+                  <div>
+                    <label className="form-label">Graduation Year</label>
+                    <Controller name="graduationYear" control={control} render={({ field }) => (
+                      <input {...field} type="number" className="form-input" />
+                    )} />
+                  </div>
+                  <div>
+                    <label className="form-label">Stream</label>
+                    <Controller name="stream" control={control} render={({ field }) => (
+                      <input {...field} className={`form-input ${errors.stream ? 'error' : ''}`} />
+                    )} />
+                    {errors.stream && <span className="error-text">{errors.stream.message}</span>}
+                  </div>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label className="form-label">Skills (comma separated)</label>
+                    <Controller name="skills" control={control} render={({ field }) => (
+                      <input {...field} className={`form-input ${errors.skills ? 'error' : ''}`} placeholder="e.g. Java, Spring, React" />
+                    )} />
+                    {errors.skills && <span className="error-text">{errors.skills.message}</span>}
+                  </div>
+                  <div>
+                    <label className="form-label">Assessment Score (0-100)</label>
+                    <Controller name="assessmentScore" control={control} render={({ field }) => (
+                      <input {...field} type="number" className="form-input" />
+                    )} />
+                  </div>
+                </div>
+              </div>
+              <div className="modal-ft">
+                <button type="button" className="btn btn-ghost" onClick={() => setOpen(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={creating || updating}>
+                  {editing ? 'Update Candidate' : 'Add Candidate'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editing ? 'Edit Candidate' : 'Add Candidate'}</DialogTitle>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent>
-            <Grid container spacing={2} pt={1}>
-              <Grid item xs={12} sm={6}>
-                <Controller name="name" control={control} render={({ field }) => (
-                  <TextField {...field} label="Full Name" fullWidth error={!!errors.name} helperText={errors.name?.message} />
-                )} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller name="email" control={control} render={({ field }) => (
-                  <TextField {...field} label="Email" fullWidth error={!!errors.email} helperText={errors.email?.message} />
-                )} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller name="phone" control={control} render={({ field }) => (
-                  <TextField {...field} label="Phone" fullWidth error={!!errors.phone} helperText={errors.phone?.message} />
-                )} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller name="coeId" control={control} render={({ field }) => (
-                  <TextField {...field} label="COE" select fullWidth error={!!errors.coeId} helperText={errors.coeId?.message}>
-                    {coes.map((c) => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
-                  </TextField>
-                )} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller name="graduationYear" control={control} render={({ field }) => (
-                  <TextField {...field} label="Graduation Year" type="number" fullWidth />
-                )} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller name="stream" control={control} render={({ field }) => (
-                  <TextField {...field} label="Stream" fullWidth error={!!errors.stream} helperText={errors.stream?.message} />
-                )} />
-              </Grid>
-              <Grid item xs={12}>
-                <Controller name="skills" control={control} render={({ field }) => (
-                  <TextField {...field} label="Skills (comma separated)" fullWidth error={!!errors.skills} helperText={errors.skills?.message || 'e.g. Java, Spring Boot, MySQL'} />
-                )} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Controller name="assessmentScore" control={control} render={({ field }) => (
-                  <TextField {...field} label="Assessment Score (0-100)" type="number" fullWidth />
-                )} />
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="contained" disabled={creating || updating}>
-              {editing ? 'Update' : 'Add'} Candidate
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </Box>
+      {importOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: 600 }}>
+            <div className="modal-hd">
+              <span className="modal-title">Bulk Import Candidates</span>
+              <button className="btn-close" onClick={() => setImportOpen(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div style={{ marginBottom: 16 }}>
+                <label className="form-label">CSV Data (Paste here)</label>
+                <div style={{ fontSize: 10, color: 'var(--g500)', marginBottom: 8 }}>
+                  Format: Name, Email, Phone, COE ID, Year, Stream, Skills, Score
+                </div>
+                <textarea 
+                  className="form-input" 
+                  style={{ minHeight: 200, fontFamily: 'monospace', fontSize: 11 }} 
+                  placeholder="John Doe, john@example.com, 9876543210, coe1, 2025, CS, Java;React, 85"
+                  value={csvData}
+                  onChange={(e) => setCsvData(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="modal-ft">
+              <button type="button" className="btn btn-ghost" onClick={() => setImportOpen(false)}>Cancel</button>
+              <button type="button" className="btn btn-primary" onClick={handleCsvImport} disabled={importing}>
+                {importing ? 'Importing...' : 'Import Candidates'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
+
+

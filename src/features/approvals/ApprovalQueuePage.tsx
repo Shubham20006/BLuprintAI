@@ -1,20 +1,12 @@
 import React from 'react';
-import {
-  Box, Button, Typography, Chip, TextField, MenuItem,
-  Table, TableBody, TableCell, TableHead, TableRow,
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  IconButton, Tooltip, alpha, useTheme,
-} from '@mui/material';
-import { CheckCircle, Cancel, OpenInNew } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import {
   useMappings, useRequirements, useApprovals,
-  useUpdateMapping, useCreateApproval,
+  useUpdateMapping, useCreateApproval, useAllMappingLineItems, useCandidates, useCOEs,
 } from '../../api/hooks';
 import { useSessionStore } from '../../store';
-import { StatusChip, PageHeader, SectionCard } from '../../components/shared';
-import { formatDate, formatDateTime, generateId } from '../../utils';
+import { formatDate, generateId } from '../../utils';
 import type { MappingStatus } from '../../types';
 
 interface ApprovalQueueProps {
@@ -26,12 +18,13 @@ export const ApprovalQueuePage: React.FC<ApprovalQueueProps> = ({ queueType }) =
   const { enqueueSnackbar } = useSnackbar();
   const { currentUser } = useSessionStore();
   const [comment, setComment] = React.useState('');
-  const [selectedMapping, setSelectedMapping] = React.useState<string | null>(null);
-  const [actionType, setActionType] = React.useState<'approve' | 'reject' | null>(null);
+  const [selectedMappingId, setSelectedMappingId] = React.useState<string | null>(null);
 
   const { data: mappings = [] } = useMappings();
   const { data: requirements = [] } = useRequirements();
-  const { data: approvals = [] } = useApprovals();
+  const { data: lineItems = [] } = useAllMappingLineItems();
+  const { data: candidates = [] } = useCandidates();
+  const { data: coes = [] } = useCOEs();
   const { mutateAsync: updateMapping } = useUpdateMapping();
   const { mutateAsync: createApproval } = useCreateApproval();
 
@@ -40,156 +33,188 @@ export const ApprovalQueuePage: React.FC<ApprovalQueueProps> = ({ queueType }) =
   const nextReject: MappingStatus = 'Draft';
 
   const queueMappings = mappings.filter((m) => m.status === filterStatus);
+  
+  // Auto-select first mapping if none selected
+  React.useEffect(() => {
+    if (queueMappings.length > 0 && !selectedMappingId) {
+      setSelectedMappingId(queueMappings[0].id);
+    }
+  }, [queueMappings, selectedMappingId]);
 
-  const handleAction = async () => {
-    if (!selectedMapping || !actionType || !currentUser) return;
+  const handleAction = async (decision: 'approve' | 'reject' | 'revision') => {
+    if (!selectedMappingId || !currentUser) return;
     try {
-      const isApprove = actionType === 'approve';
+      const isApprove = decision === 'approve';
+      const isRevision = decision === 'revision';
+      
       await createApproval({
         id: generateId(),
-        mappingId: selectedMapping,
+        mappingId: selectedMappingId,
         actorRole: currentUser.role,
         actorId: currentUser.id,
-        decision: isApprove ? 'Approved' : 'Rejected',
+        decision: isApprove ? 'Approved' : isRevision ? 'Revision Requested' : 'Rejected',
         comment,
         timestamp: new Date().toISOString(),
       });
+
       await updateMapping({
-        id: selectedMapping,
-        status: isApprove ? nextApprove : nextReject,
+        id: selectedMappingId,
+        status: isApprove ? nextApprove : 'Draft',
         updatedAt: new Date().toISOString(),
       });
-      enqueueSnackbar(isApprove ? 'Mapping approved!' : 'Mapping rejected', {
+
+      enqueueSnackbar(isApprove ? 'Mapping approved!' : isRevision ? 'Revision requested' : 'Mapping rejected', {
         variant: isApprove ? 'success' : 'warning',
       });
-      setSelectedMapping(null);
-      setActionType(null);
+      
+      // Select next in queue or null
+      const currentIndex = queueMappings.findIndex(m => m.id === selectedMappingId);
+      const nextMapping = queueMappings[currentIndex + 1] || queueMappings[currentIndex - 1];
+      setSelectedMappingId(nextMapping?.id || null);
       setComment('');
     } catch {
       enqueueSnackbar('Error processing action', { variant: 'error' });
     }
   };
 
-  const title = queueType === 'engineering' ? 'Engineering Review Queue' : 'MIS Confirmation Queue';
-  const subtitle = queueType === 'engineering'
-    ? 'Mappings awaiting Head of Engineering approval'
-    : 'Mappings awaiting MIS Manager confirmation';
+  const selectedMapping = mappings.find(m => m.id === selectedMappingId);
+  const selectedReq = selectedMapping ? requirements.find(r => r.id === selectedMapping.requirementId) : null;
+  const selectedItems = lineItems.filter(li => li.mappingId === selectedMappingId);
 
   return (
-    <Box>
-      <PageHeader title={title} subtitle={subtitle} />
+    <div style={{ height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
+      <div className="topbar">
+        <div className="topbar-left">
+          <span className="breadcrumb">Review Queue / <span>Pending Approvals ({queueMappings.length})</span></span>
+        </div>
+      </div>
 
-      {queueMappings.length === 0 ? (
-        <SectionCard>
-          <Box sx={{ textAlign: 'center', py: 6 }}>
-            <CheckCircle sx={{ fontSize: 48, color: 'success.main', mb: 2, opacity: 0.5 }} />
-            <Typography variant="h6" color="text.secondary">All clear!</Typography>
-            <Typography variant="body2" color="text.secondary">No mappings pending in this queue.</Typography>
-          </Box>
-        </SectionCard>
-      ) : (
-        <SectionCard>
-          <Box sx={{ overflowX: 'auto' }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Requirement ID</TableCell>
-                  <TableCell>Tech Stack</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell>Notes</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+      <div className="content" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '20px' }}>
+        <div className="panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <div className="panel-hd" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span className="panel-title">Mapping Proposals Awaiting Review</span>
+            <span className="badge draft" style={{ color: '#9a3412', background: '#ffedd5', borderColor: '#fdba74', fontWeight: 700 }}>
+              {queueMappings.length} Pending
+            </span>
+          </div>
+          
+          <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+            {/* Left Column: Queue List */}
+            <div style={{ width: 400, borderRight: '1px solid var(--g200)', overflowY: 'auto', background: 'var(--g50)', padding: 12 }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--g500)', textTransform: 'uppercase', marginBottom: 12, letterSpacing: '0.05em' }}>Queue</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {queueMappings.map((m) => {
-                  const req = requirements.find((r) => r.id === m.requirementId);
+                  const req = requirements.find(r => r.id === m.requirementId);
+                  const isSelected = selectedMappingId === m.id;
+                  // Mock AI score based on avg assessment score of candidates
+                  const mItems = lineItems.filter(li => li.mappingId === m.id);
+                  const avgScore = mItems.length > 0 
+                    ? Math.round(mItems.reduce((acc, li) => {
+                        const cand = candidates.find(c => c.id === li.candidateId);
+                        return acc + (cand?.assessmentScore || 0);
+                      }, 0) / mItems.length)
+                    : 85;
+
                   return (
-                    <TableRow key={m.id} hover>
-                      <TableCell>
-                        <Typography variant="caption" fontWeight={700} sx={{ fontFamily: 'monospace' }}>
-                          {req?.requirementCode || m.requirementId}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {req && <Chip label={req.techStack} size="small" color="primary" variant="outlined" />}
-                      </TableCell>
-                      <TableCell><Typography variant="caption">{formatDate(m.createdAt)}</Typography></TableCell>
-                      <TableCell>
-                        <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: 200, display: 'block' }}>
-                          {m.notes || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell><StatusChip status={m.status} type="mapping" /></TableCell>
-                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-                          <Tooltip title="View detail">
-                            <IconButton
-                              size="small"
-                              onClick={() => navigate(`/mappings/${m.id}`)}
-                              sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}
-                            >
-                              <OpenInNew fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={queueType === 'engineering' ? 'Approve' : 'Confirm'}>
-                            <IconButton
-                              size="small"
-                              onClick={() => { setSelectedMapping(m.id); setActionType('approve'); }}
-                              sx={{
-                                bgcolor: 'success.main', color: '#fff', borderRadius: 1.5,
-                                '&:hover': { bgcolor: 'success.dark' },
-                              }}
-                            >
-                              <CheckCircle fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Reject">
-                            <IconButton
-                              size="small"
-                              onClick={() => { setSelectedMapping(m.id); setActionType('reject'); }}
-                              sx={{
-                                border: '1px solid', borderColor: 'error.main',
-                                color: 'error.main', borderRadius: 1.5,
-                                '&:hover': { bgcolor: 'error.main', color: '#fff' },
-                              }}
-                            >
-                              <Cancel fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
+                    <div 
+                      key={m.id}
+                      onClick={() => setSelectedMappingId(m.id)}
+                      style={{
+                        padding: '12px 16px',
+                        background: '#fff',
+                        borderRadius: 8,
+                        border: isSelected ? '2px solid var(--blue)' : '1px solid var(--g200)',
+                        cursor: 'pointer',
+                        boxShadow: isSelected ? '0 4px 6px -1px rgba(0,0,0,0.1)' : 'none',
+                        position: 'relative',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? 'var(--blue)' : 'var(--navy)' }}>{req?.requirementCode.split('-').slice(0,2).join('-')}</span>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: '#9333ea' }}>{avgScore}% AI</span>
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--g600)', marginBottom: 2 }}>{req?.techStack.split(' — ')[0]} · {req?.location.split(',')[0]} · {req?.openPositions} seats</div>
+                      <div style={{ fontSize: 10, color: 'var(--g400)' }}>Proposed by MIS Manager · 2h ago</div>
+                    </div>
                   );
                 })}
-              </TableBody>
-            </Table>
-          </Box>
-        </SectionCard>
-      )}
+                {queueMappings.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--g500)', fontSize: 12 }}>
+                    No pending proposals
+                  </div>
+                )}
+              </div>
+            </div>
 
-      {/* Action Confirm Dialog */}
-      <Dialog open={!!selectedMapping} onClose={() => { setSelectedMapping(null); setActionType(null); }} maxWidth="xs" fullWidth>
-        <DialogTitle>
-          {actionType === 'approve'
-            ? (queueType === 'engineering' ? 'Approve Mapping' : 'Confirm Mapping')
-            : 'Reject Mapping'}
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Comment (optional)" fullWidth multiline rows={3} value={comment}
-            onChange={(e) => setComment(e.target.value)} sx={{ mt: 1 }} />
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => { setSelectedMapping(null); setActionType(null); setComment(''); }}>Cancel</Button>
-          <Button
-            variant="contained"
-            color={actionType === 'approve' ? 'success' : 'error'}
-            onClick={handleAction}>
-            {actionType === 'approve' ? 'Confirm Approval' : 'Confirm Rejection'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+            {/* Right Column: Review Detail */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#fff' }}>
+              {selectedMapping ? (
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--g100)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--g500)', textTransform: 'uppercase' }}>
+                      Review — <span style={{ color: 'var(--navy)' }}>{selectedReq?.requirementCode} ({selectedReq?.techStack.split(' — ')[1]})</span>
+                    </div>
+                  </div>
+                  
+                  <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
+                    <div style={{ marginBottom: 24 }}>
+                      <table className="tbl" style={{ border: '1px solid var(--g200)', borderRadius: 6, overflow: 'hidden' }}>
+                        <thead style={{ background: 'var(--g50)' }}>
+                          <tr>
+                            <th>Candidate</th>
+                            <th>COE</th>
+                            <th>Score</th>
+                            <th>Override</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedItems.map((item) => {
+                            const cand = candidates.find(c => c.id === item.candidateId);
+                            const coe = coes.find(c => c.id === cand?.coeId);
+                            return (
+                              <tr key={item.id}>
+                                <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{cand?.name}</td>
+                                <td>{coe?.name.split(' ')[0]}</td>
+                                <td style={{ fontWeight: 700, color: 'var(--green)' }}>{cand?.assessmentScore}%</td>
+                                <td><i className="ti ti-minus" style={{ color: 'var(--g300)' }} /></td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" style={{ fontWeight: 700, fontSize: 12 }}>Review comments</label>
+                      <textarea 
+                        className="form-input" 
+                        rows={4} 
+                        placeholder="Add comments for MIS Manager..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        style={{ background: 'var(--g50)', border: '1px solid var(--g300)' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ padding: '16px 24px', borderTop: '1px solid var(--g100)', display: 'flex', gap: 12 }}>
+                    <button className="btn" style={{ flex: 1, background: 'var(--red)', color: '#fff', border: 'none', fontWeight: 600 }} onClick={() => handleAction('reject')}>Reject</button>
+                    <button className="btn" style={{ flex: 1, background: 'var(--blue-light)', color: 'var(--blue)', border: '1px solid var(--blue-light)', fontWeight: 600 }} onClick={() => handleAction('revision')}>Request Revision</button>
+                    <button className="btn" style={{ flex: 1, background: 'var(--green)', color: '#fff', border: 'none', fontWeight: 600 }} onClick={() => handleAction('approve')}>Approve</button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g400)', flexDirection: 'column' }}>
+                  <i className="ti ti-clipboard-check" style={{ fontSize: 64, opacity: 0.2, marginBottom: 16 }} />
+                  <div>Select a proposal to begin review</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
+

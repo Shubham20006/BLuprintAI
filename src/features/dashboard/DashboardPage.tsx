@@ -1,274 +1,154 @@
 import React from 'react';
-import {
-  Box, Grid, Typography, Select, MenuItem, FormControl,
-  InputLabel, Button, useTheme, alpha, Chip, Divider,
-  Table, TableBody, TableCell, TableHead, TableRow, Paper,
-  LinearProgress,
-} from '@mui/material';
-import {
-  Assignment, People, AccountTree, CheckCircle,
-  Download, Refresh, TrendingUp,
-} from '@mui/icons-material';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, Legend,
-  FunnelChart, Funnel, LabelList,
-} from 'recharts';
-import { useMandates, useRequirements, useCandidates, useMappings, useCOEs, useLOIs } from '../../api/hooks';
-import { useFiltersStore, useSessionStore } from '../../store';
-import { StatCard, SectionCard, StatusChip, CapacityBar } from '../../components/shared';
-import { formatDate, exportToCSV, pct } from '../../utils';
-
-const COLORS = ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
+import { useNavigate } from 'react-router-dom';
+import { useSessionStore } from '../../store';
+import { useRequirements, useCandidates, useCOEs, useLOIs } from '../../api/hooks';
 
 export const DashboardPage: React.FC = () => {
-  const theme = useTheme();
-  const { filters, setFilter, resetFilters } = useFiltersStore();
   const { currentUser } = useSessionStore();
-
-  const { data: mandates = [] } = useMandates();
+  const navigate = useNavigate();
+  
   const { data: requirements = [] } = useRequirements();
   const { data: candidates = [] } = useCandidates();
-  const { data: mappings = [] } = useMappings();
   const { data: coes = [] } = useCOEs();
   const { data: lois = [] } = useLOIs();
 
-  // ── Derived metrics ──────────────────────────────────────────────────────
   const totalOpen = requirements.reduce((s, r) => s + r.openPositions, 0);
   const totalFilled = requirements.reduce((s, r) => s + r.filledPositions, 0);
+  const totalSent = lois.length; // All LOIs issued (Sent + Signed)
   const totalSigned = lois.filter((l) => l.status === 'Signed').length;
   const totalCFP = candidates.filter((c) => c.status === 'CFP Started').length;
 
-  // ── Funnel data ──────────────────────────────────────────────────────────
-  const funnelData = [
-    { name: 'Open Positions', value: totalOpen, fill: '#6366f1' },
-    { name: 'Mapped', value: totalFilled, fill: '#8b5cf6' },
-    { name: 'LOI Signed', value: totalSigned, fill: '#06b6d4' },
-    { name: 'CFP Started', value: totalCFP, fill: '#10b981' },
-  ];
+  const isAM = currentUser?.role === 'ACCOUNT_MANAGER';
 
-  // ── COE conversion chart ─────────────────────────────────────────────────
-  const coeData = coes.map((coe) => {
-    const coeCandidates = candidates.filter((c) => c.coeId === coe.id);
-    const mapped = coeCandidates.filter((c) =>
-      ['Mapped','Discussed','LOI Sent','LOI Signed','CFP Started'].includes(c.status)
-    ).length;
-    const signed = coeCandidates.filter((c) =>
-      ['LOI Signed','CFP Started'].includes(c.status)
-    ).length;
-    return { name: coe.name.split(' ').slice(0, 2).join(' '), selected: coeCandidates.length, mapped, signed };
-  });
-
-  // ── Tech stack distribution ───────────────────────────────────────────────
-  const techMap: Record<string, number> = {};
-  requirements.forEach((r) => {
-    techMap[r.techStack] = (techMap[r.techStack] || 0) + r.openPositions;
-  });
-  const techData = Object.entries(techMap).map(([name, value]) => ({ name, value }));
-
-  // ── Aging table ───────────────────────────────────────────────────────────
-  const agingMappings = mappings
-    .filter((m) => !['CFP Started', 'Signed'].includes(m.status))
-    .map((m) => {
-      const days = Math.floor((Date.now() - new Date(m.updatedAt).getTime()) / 86400000);
-      const req = requirements.find((r) => r.id === m.requirementId);
-      return { ...m, days, reqCode: req?.requirementCode || m.requirementId };
-    })
-    .sort((a, b) => b.days - a.days);
-
-  const handleExport = () => {
-    exportToCSV(
-      requirements.map((r) => ({
-        RequirementCode: r.requirementCode,
-        TechStack: r.techStack,
-        OpenPositions: r.openPositions,
-        FilledPositions: r.filledPositions,
-        Status: r.status,
-        OnboardingDate: r.onboardingDate,
-      })),
-      'requirements-export'
-    );
-  };
-
-  return (
-    <Box>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-        <Box>
-          <Typography variant="h5" fontWeight={700}>MIS Dashboard</Typography>
-          <Typography variant="body2" color="text.secondary">Universal mandate & mapping intelligence view</Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Button size="small" startIcon={<Refresh />} onClick={resetFilters} variant="outlined">Reset</Button>
-          <Button size="small" startIcon={<Download />} onClick={handleExport} variant="contained">Export CSV</Button>
-        </Box>
-      </Box>
-
-      {/* Filters */}
-      <Box sx={{
-        display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3, p: 2,
-        borderRadius: 2, background: theme.palette.background.paper,
-        border: `1px solid ${theme.palette.divider}`,
-      }}>
-        <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel>COE</InputLabel>
-          <Select value={filters.coeId} label="COE" onChange={(e) => setFilter('coeId', e.target.value)}>
-            <MenuItem value="">All COEs</MenuItem>
-            {coes.map((c) => <MenuItem key={c.id} value={c.id}>{c.name.split(' ').slice(0,2).join(' ')}</MenuItem>)}
-          </Select>
-        </FormControl>
-        <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel>Tech Stack</InputLabel>
-          <Select value={filters.techStack} label="Tech Stack" onChange={(e) => setFilter('techStack', e.target.value)}>
-            <MenuItem value="">All Stacks</MenuItem>
-            {[...new Set(requirements.map((r) => r.techStack))].map((t) => (
-              <MenuItem key={t} value={t}>{t}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel>Status</InputLabel>
-          <Select value={filters.status} label="Status" onChange={(e) => setFilter('status', e.target.value)}>
-            <MenuItem value="">All Status</MenuItem>
-            {['draft','active','fulfilled','cancelled'].map((s) => (
-              <MenuItem key={s} value={s} sx={{ textTransform: 'capitalize' }}>{s}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-
-      {/* KPI Cards */}
-      <Grid container spacing={2.5} mb={3}>
-        {[
-          { label: 'Total Open Positions', value: totalOpen, icon: <Assignment />, color: '#6366f1' },
-          { label: 'Candidates Mapped', value: totalFilled, icon: <People />, color: '#8b5cf6' },
-          { label: 'LOIs Signed', value: totalSigned, icon: <CheckCircle />, color: '#10b981' },
-          { label: 'CFP Started', value: totalCFP, icon: <TrendingUp />, color: '#f59e0b' },
-        ].map((kpi) => (
-          <Grid item xs={6} md={3} key={kpi.label}>
-            <StatCard {...kpi} />
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* Charts row */}
-      <Grid container spacing={2.5} mb={3}>
-        {/* Funnel */}
-        <Grid item xs={12} md={5}>
-          <SectionCard title="Conversion Funnel">
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={funnelData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.5)} />
-                <XAxis type="number" tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={100} />
-                <Tooltip
-                  contentStyle={{ background: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, borderRadius: 8 }}
-                />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-                  {funnelData.map((entry, i) => (
-                    <Cell key={i} fill={entry.fill} />
+  if (isAM) {
+    return (
+      <>
+        <div className="topbar">
+          <div className="topbar-left"><span className="breadcrumb">Dashboard / <span>Mandates Overview</span></span></div>
+          <div className="topbar-right">
+            <button className="btn btn-primary btn-sm" onClick={() => navigate('/requirements')}>
+              <i className="ti ti-plus" aria-hidden="true" /> New Mandate
+            </button>
+          </div>
+        </div>
+        
+        <div className="content">
+          <div className="kpi-row">
+            <div className="kpi"><div className="kpi-label">Total Mandates</div><div className="kpi-val">{requirements.length}</div><div className="kpi-sub">Active requirements</div></div>
+            <div className="kpi green"><div className="kpi-label">Fulfilled</div><div className="kpi-val">{totalSigned}</div><div className="kpi-sub">LOIs Signed</div></div>
+            <div className="kpi orange"><div className="kpi-label">In Mapping</div><div className="kpi-val">{totalFilled}</div><div className="kpi-sub">Awaiting HOE Review</div></div>
+            <div className="kpi purple"><div className="kpi-label">Open Positions</div><div className="kpi-val">{totalOpen}</div><div className="kpi-sub">Across {requirements.length} clients</div></div>
+          </div>
+          
+          <div className="panel">
+            <div className="panel-hd">
+              <span className="panel-title"><i className="ti ti-file-description" aria-hidden="true" style={{marginRight: 5, color: 'var(--blue)'}} />Active Mandates</span>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <select className="form-select" style={{ width: 120, padding: '4px 8px', fontSize: 11 }}>
+                  <option>All Clients</option>
+                </select>
+                <button className="btn btn-ghost btn-sm"><i className="ti ti-download" aria-hidden="true" /> Export</button>
+              </div>
+            </div>
+            <div style={{ padding: 0 }}>
+              <table className="tbl">
+                <thead><tr><th>Requirement ID</th><th>Tech Stack</th><th>Positions</th><th>Mandate Date</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                  {requirements.slice(0, 5).map(req => (
+                    <tr key={req.id}>
+                      <td style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--navy)', fontWeight: 600 }}>{req.requirementCode}</td>
+                      <td>{req.techStack}</td>
+                      <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{req.openPositions}</td>
+                      <td>{new Date(req.createdAt).toLocaleDateString()}</td>
+                      <td>{req.location || 'Remote'}</td>
+                      <td><span className={`badge ${req.status === 'active' ? 'active' : 'draft'}`}>{req.status}</span></td>
+                      <td><button className="btn btn-ghost btn-sm"><i className="ti ti-eye" aria-hidden="true" /></button></td>
+                    </tr>
                   ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </SectionCard>
-        </Grid>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
-        {/* COE Conversion */}
-        <Grid item xs={12} md={7}>
-          <SectionCard title="COE-wise Pipeline">
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={coeData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.5)} />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip contentStyle={{ background: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, borderRadius: 8 }} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="selected" name="Selected" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="mapped" name="Mapped" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="signed" name="Signed" fill="#10b981" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </SectionCard>
-        </Grid>
+  // Default / MIS Dashboard
+  return (
+    <>
+      <div className="topbar">
+        <div className="topbar-left"><span className="breadcrumb">Analytics / <span>MIS Dashboard</span></span></div>
+        <div className="topbar-right">
+          <select className="form-select" style={{ width: 100, padding: '4px 8px', fontSize: 11 }}><option>This Month</option></select>
+          <button className="btn btn-ghost btn-sm"><i className="ti ti-download" aria-hidden="true" /> Export</button>
+        </div>
+      </div>
 
-        {/* Tech stack pie */}
-        <Grid item xs={12} md={5}>
-          <SectionCard title="Open Positions by Tech Stack">
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie data={techData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
-                  {techData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                </Pie>
-                <Tooltip contentStyle={{ background: theme.palette.background.paper, border: `1px solid ${theme.palette.divider}`, borderRadius: 8 }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </SectionCard>
-        </Grid>
+      <div className="content">
+        <div className="kpi-row">
+          <div className="kpi"><div className="kpi-label">Total Mandates</div><div className="kpi-val">{requirements.length}</div><div className="kpi-sub">Total reqs loaded</div></div>
+          <div className="kpi green"><div className="kpi-label">Fulfilment rate</div><div className="kpi-val">{totalOpen ? Math.round((totalSigned/totalOpen)*100) : 0}%</div><div className="kpi-sub">Target met</div></div>
+          <div className="kpi orange"><div className="kpi-label">LOI conversion</div><div className="kpi-val">{totalSent ? Math.round((totalSigned/totalSent)*100) : 0}%</div><div className="kpi-sub">LOI signed / issued</div></div>
+          <div className="kpi purple"><div className="kpi-label">CFP Started</div><div className="kpi-val">{totalCFP}</div><div className="kpi-sub">Candidates onboarding</div></div>
+        </div>
 
-        {/* Requirements capacity */}
-        <Grid item xs={12} md={7}>
-          <SectionCard title="Requirements Capacity">
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {requirements.slice(0, 5).map((r) => (
-                <Box key={r.id}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="caption" fontWeight={600} noWrap sx={{ maxWidth: '60%' }}>
-                      {r.requirementCode.split('-').slice(0, 3).join('-')}
-                    </Typography>
-                    <StatusChip status={r.status} type="mandate" />
-                  </Box>
-                  <CapacityBar filled={r.filledPositions} open={r.openPositions} />
-                </Box>
-              ))}
-            </Box>
-          </SectionCard>
-        </Grid>
-      </Grid>
-
-      {/* Aging / SLA table */}
-      <SectionCard title="Aging Mappings (SLA Risk)">
-        {agingMappings.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" textAlign="center" py={3}>No pending mappings</Typography>
-        ) : (
-          <Box sx={{ overflowX: 'auto' }}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Requirement</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Days Pending</TableCell>
-                  <TableCell>Risk</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {agingMappings.slice(0, 8).map((m) => (
-                  <TableRow key={m.id} hover>
-                    <TableCell>
-                      <Typography variant="caption" fontWeight={600}>{m.reqCode}</Typography>
-                    </TableCell>
-                    <TableCell><StatusChip status={m.status} type="mapping" /></TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={700}
-                        sx={{ color: m.days > 7 ? '#ef4444' : m.days > 3 ? '#f59e0b' : 'inherit' }}>
-                        {m.days}d
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={m.days > 7 ? 'HIGH' : m.days > 3 ? 'MED' : 'LOW'}
-                        size="small"
-                        color={m.days > 7 ? 'error' : m.days > 3 ? 'warning' : 'success'}
-                        sx={{ fontWeight: 700, fontSize: '0.65rem' }}
-                      />
-                    </TableCell>
-                  </TableRow>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div>
+            <div className="panel">
+              <div className="panel-hd"><span className="panel-title">Mandate Pipeline Funnel</span></div>
+              <div className="panel-body" style={{ padding: 10 }}>
+                <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--navy)', width: '100%' }}><span className="funnel-lbl">Total Open Positions</span><span className="funnel-val">{totalOpen}</span></div></div>
+                <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--blue)', width: '85%' }}><span className="funnel-lbl">Mapped</span><span className="funnel-val">{totalFilled}</span></div></div>
+                <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--teal)', width: '70%' }}><span className="funnel-lbl">LOI Issued</span><span className="funnel-val">{totalSigned}</span></div></div>
+                <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--green)', width: '55%' }}><span className="funnel-lbl">CFP Started</span><span className="funnel-val">{totalCFP}</span></div></div>
+              </div>
+            </div>
+            <div className="panel" style={{ marginTop: 10 }}>
+              <div className="panel-hd">
+                <span className="panel-title" style={{ color: 'var(--purple)' }}><i className="ti ti-robot" aria-hidden="true" style={{ marginRight: 4 }} />AI Weekly Summary</span>
+                <span style={{ fontSize: 10, color: 'var(--g500)' }}>Mon, 25 Nov 2025</span>
+              </div>
+              <div className="panel-body" style={{ padding: 10, fontSize: 11, color: 'var(--g500)', lineHeight: 1.6 }}>
+                <div style={{ marginBottom: 6, color: 'var(--g900)', fontWeight: 500 }}>3 recommendations this week:</div>
+                <div style={{ padding: '5px 8px', background: 'var(--orange-light)', borderRadius: 5, marginBottom: 5, color: 'var(--orange)', fontSize: 10 }}><i className="ti ti-alert-triangle" aria-hidden="true" style={{ marginRight: 4 }} />Nov21-862 (AIML) at SLA risk — HOE review pending</div>
+                <div style={{ padding: '5px 8px', background: 'var(--green-light)', borderRadius: 5, marginBottom: 5, color: 'var(--green)', fontSize: 10 }}><i className="ti ti-trending-up" aria-hidden="true" style={{ marginRight: 4 }} />SRM COE placement rate improved 12% — prioritise for next mandate</div>
+                <div style={{ padding: '5px 8px', background: 'var(--blue-light)', borderRadius: 5, color: 'var(--navy)', fontSize: 10 }}><i className="ti ti-info-circle" aria-hidden="true" style={{ marginRight: 4 }} />5 LOIs pending signature &gt; 5 days — coordinate with COE team</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="panel">
+              <div className="panel-hd"><span className="panel-title">COE Performance Score</span></div>
+              <div className="panel-body" style={{ padding: 10 }}>
+                {coes.slice(0, 5).map((coe, idx) => (
+                  <div className="chart-bar-row" key={coe.id}>
+                    <span className="chart-bar-label" style={{ width: 64 }}>{coe.name.split(' ')[0]}</span>
+                    <div className="chart-bar-track">
+                      <div className="chart-bar-fill" style={{ width: `${90 - (idx * 5)}%`, background: idx === 0 ? 'var(--green)' : idx < 3 ? 'var(--blue)' : 'var(--orange)' }}>
+                        {90 - (idx * 5)}%
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
-          </Box>
-        )}
-      </SectionCard>
-    </Box>
+              </div>
+            </div>
+            <div className="panel" style={{ marginTop: 10 }}>
+              <div className="panel-hd"><span className="panel-title">Tech Domain Distribution</span></div>
+              <div className="panel-body" style={{ padding: 10 }}>
+                <table style={{ width: '100%', fontSize: 11 }}>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid var(--g200)' }}><td style={{ padding: '5px 0', color: 'var(--g500)' }}>Java Full Stack</td><td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--navy)' }}>14 mandates</td><td style={{ textAlign: 'right' }}><span className="badge active">30%</span></td></tr>
+                    <tr style={{ borderBottom: '1px solid var(--g200)' }}><td style={{ padding: '5px 0', color: 'var(--g500)' }}>.NET / C#</td><td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--navy)' }}>11 mandates</td><td style={{ textAlign: 'right' }}><span className="badge mapping">23%</span></td></tr>
+                    <tr style={{ borderBottom: '1px solid var(--g200)' }}><td style={{ padding: '5px 0', color: 'var(--g500)' }}>AI/ML &amp; Data Eng</td><td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--navy)' }}>9 mandates</td><td style={{ textAlign: 'right' }}><span className="badge mapped">19%</span></td></tr>
+                    <tr><td style={{ padding: '5px 0', color: 'var(--g500)' }}>Python Dev</td><td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--navy)' }}>7 mandates</td><td style={{ textAlign: 'right' }}><span className="badge loi">15%</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };

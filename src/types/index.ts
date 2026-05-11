@@ -137,6 +137,7 @@ export interface Candidate {
   assessmentScore: number;
   status: CandidateStatus;
   externalKey: string;
+  availabilityDate: string;
   createdAt: string;
 }
 
