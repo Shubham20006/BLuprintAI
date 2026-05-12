@@ -75,7 +75,7 @@ export const Sidebar: React.FC = () => {
       )}
 
       <div style={{ flex: 1, overflowY: 'auto', marginTop: 4 }}>
-        {NAV_ITEMS.filter(isItemVisible).map((item) => (
+        {NAV_ITEMS.filter(isItemVisible)?.map((item) => (
           <div
             key={item.label + item.path}
             className={`sb-item ${isActive(item.path) ? 'active' : ''}`}
@@ -90,11 +90,11 @@ export const Sidebar: React.FC = () => {
       {currentUser && (
         <div className="sb-bottom">
           <div className="sb-user" onClick={handleLogout} style={{ cursor: 'pointer' }} title="Click to logout">
-            <div className="sb-avatar">{currentUser.avatar || currentUser.name.slice(0, 2)}</div>
+            <div className="sb-avatar">{currentUser.avatar || currentUser.name?.slice(0, 2)}</div>
             <div>
               <div className="sb-uname">{currentUser.name}</div>
-              <div className="sb-urole" style={{ fontSize: 8, opacity: 0.7 }}>
-                {currentUser.role.split('_')[0]}
+              <div className="sb-urole" style={{ fontSize: 10, opacity: 0.7 }}>
+                {currentUser.role?.split('_')[0]}
               </div>
             </div>
           </div>

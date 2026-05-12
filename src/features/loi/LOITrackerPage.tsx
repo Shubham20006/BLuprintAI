@@ -209,10 +209,10 @@ export const LOITrackerPage: React.FC = () => {
                     <tr key={loi.id}>
                       <td style={{ paddingLeft: 24 }}>
                         <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{candidate?.name || loi.candidateId}</div>
-                        <div style={{ fontSize: 9, color: 'var(--g500)' }}>{candidate?.email}</div>
+                        <div style={{ fontSize: 11, color: 'var(--g500)' }}>{candidate?.email}</div>
                       </td>
                       <td>
-                        <div style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: 10, color: 'var(--blue)' }}>
+                        <div style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: 12, color: 'var(--blue)' }}>
                           {req?.requirementCode || loi.requirementId}
                         </div>
                       </td>
@@ -240,7 +240,7 @@ export const LOITrackerPage: React.FC = () => {
                 {lois.length === 0 && (
                   <tr>
                     <td colSpan={6} style={{ textAlign: 'center', padding: '60px 0', color: 'var(--g500)' }}>
-                      <div style={{ fontSize: 32, opacity: 0.2, marginBottom: 10 }}><i className="ti ti-mail-forward" /></div>
+                      <div style={{ fontSize: 34, opacity: 0.2, marginBottom: 10 }}><i className="ti ti-mail-forward" /></div>
                       No LOIs issued yet
                     </td>
                   </tr>
@@ -297,15 +297,15 @@ export const LOITrackerPage: React.FC = () => {
                             style={{ width: 16, height: 16, cursor: 'pointer' }}
                           />
                           <div style={{ flex: 1, marginLeft: 10 }}>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--navy)' }}>{c.name}</div>
-                            <div style={{ fontSize: 10, color: 'var(--g500)' }}>{c.stream} • {c.email}</div>
+                            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--navy)' }}>{c.name}</div>
+                            <div style={{ fontSize: 12, color: 'var(--g500)' }}>{c.stream} • {c.email}</div>
                           </div>
-                          <div className="badge active" style={{ fontSize: 9 }}>Discussed</div>
+                          <div className="badge active" style={{ fontSize: 11 }}>Discussed</div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div style={{ textAlign: 'center', padding: '20px', color: 'var(--g500)', fontSize: 12 }}>
+                    <div style={{ textAlign: 'center', padding: '20px', color: 'var(--g500)', fontSize: 14 }}>
                       No candidates in 'Discussed' status. Run discussions first.
                     </div>
                   )}

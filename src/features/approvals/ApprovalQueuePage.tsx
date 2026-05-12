@@ -101,7 +101,7 @@ export const ApprovalQueuePage: React.FC<ApprovalQueueProps> = ({ queueType }) =
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
             {/* Left Column: Queue List */}
             <div style={{ width: 400, borderRight: '1px solid var(--g200)', overflowY: 'auto', background: 'var(--g50)', padding: 12 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--g500)', textTransform: 'uppercase', marginBottom: 12, letterSpacing: '0.05em' }}>Queue</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--g500)', textTransform: 'uppercase', marginBottom: 12, letterSpacing: '0.05em' }}>Queue</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {queueMappings.map((m) => {
                   const req = requirements.find(r => r.id === m.requirementId);
@@ -131,16 +131,16 @@ export const ApprovalQueuePage: React.FC<ApprovalQueueProps> = ({ queueType }) =
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? 'var(--blue)' : 'var(--navy)' }}>{req?.requirementCode.split('-').slice(0,2).join('-')}</span>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: '#9333ea' }}>{avgScore}% AI</span>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: isSelected ? 'var(--blue)' : 'var(--navy)' }}>{req?.requirementCode.split('-').slice(0,2).join('-')}</span>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: '#9333ea' }}>{avgScore}% AI</span>
                       </div>
-                      <div style={{ fontSize: 11, color: 'var(--g600)', marginBottom: 2 }}>{req?.techStack.split(' — ')[0]} · {req?.location.split(',')[0]} · {req?.openPositions} seats</div>
-                      <div style={{ fontSize: 10, color: 'var(--g400)' }}>Proposed by MIS Manager · 2h ago</div>
+                      <div style={{ fontSize: 13, color: 'var(--g600)', marginBottom: 2 }}>{req?.techStack.split(' — ')[0]} · {req?.location.split(',')[0]} · {req?.openPositions} seats</div>
+                      <div style={{ fontSize: 12, color: 'var(--g400)' }}>Proposed by MIS Manager · 2h ago</div>
                     </div>
                   );
                 })}
                 {queueMappings.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--g500)', fontSize: 12 }}>
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--g500)', fontSize: 14 }}>
                     No pending proposals
                   </div>
                 )}
@@ -152,7 +152,7 @@ export const ApprovalQueuePage: React.FC<ApprovalQueueProps> = ({ queueType }) =
               {selectedMapping ? (
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--g100)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--g500)', textTransform: 'uppercase' }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--g500)', textTransform: 'uppercase' }}>
                       Review — <span style={{ color: 'var(--navy)' }}>{selectedReq?.requirementCode} ({selectedReq?.techStack.split(' — ')[1]})</span>
                     </div>
                   </div>
@@ -186,7 +186,7 @@ export const ApprovalQueuePage: React.FC<ApprovalQueueProps> = ({ queueType }) =
                     </div>
 
                     <div className="form-group">
-                      <label className="form-label" style={{ fontWeight: 700, fontSize: 12 }}>Review comments</label>
+                      <label className="form-label" style={{ fontWeight: 700, fontSize: 14 }}>Review comments</label>
                       <textarea 
                         className="form-input" 
                         rows={4} 
@@ -206,7 +206,7 @@ export const ApprovalQueuePage: React.FC<ApprovalQueueProps> = ({ queueType }) =
                 </div>
               ) : (
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--g400)', flexDirection: 'column' }}>
-                  <i className="ti ti-clipboard-check" style={{ fontSize: 64, opacity: 0.2, marginBottom: 16 }} />
+                  <i className="ti ti-clipboard-check" style={{ fontSize: 66, opacity: 0.2, marginBottom: 16 }} />
                   <div>Select a proposal to begin review</div>
                 </div>
               )}

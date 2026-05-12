@@ -205,23 +205,23 @@ export const CandidatesPage: React.FC = () => {
                     <tr key={c.id}>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--blue)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 600 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--blue)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600 }}>
                             {c.name.split(' ').map(w => w[0]).join('').slice(0,2)}
                           </div>
                           <div>
                             <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{c.name}</div>
-                            <div style={{ fontSize: 10, color: 'var(--g500)' }}>{c.email}</div>
+                            <div style={{ fontSize: 12, color: 'var(--g500)' }}>{c.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td><span style={{ fontSize: 11 }}>{coe?.name.split(' ')[0] || c.coeId}</span></td>
+                      <td><span style={{ fontSize: 13 }}>{coe?.name.split(' ')[0] || c.coeId}</span></td>
                       <td>{c.stream}</td>
                       <td>
                         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', maxWidth: 200 }}>
                           {c.skills.slice(0, 2).map((s) => (
-                            <span key={s} className="badge mapping" style={{ fontSize: 9 }}>{s}</span>
+                            <span key={s} className="badge mapping" style={{ fontSize: 11 }}>{s}</span>
                           ))}
-                          {c.skills.length > 2 && <span className="badge mapping" style={{ fontSize: 9 }}>+{c.skills.length - 2}</span>}
+                          {c.skills.length > 2 && <span className="badge mapping" style={{ fontSize: 11 }}>+{c.skills.length - 2}</span>}
                         </div>
                       </td>
                       <td>
@@ -341,12 +341,12 @@ export const CandidatesPage: React.FC = () => {
             <div className="modal-body">
               <div style={{ marginBottom: 16 }}>
                 <label className="form-label">CSV Data (Paste here)</label>
-                <div style={{ fontSize: 10, color: 'var(--g500)', marginBottom: 8 }}>
+                <div style={{ fontSize: 12, color: 'var(--g500)', marginBottom: 8 }}>
                   Format: Name, Email, Phone, COE ID, Year, Stream, Skills, Score
                 </div>
                 <textarea 
                   className="form-input" 
-                  style={{ minHeight: 200, fontFamily: 'monospace', fontSize: 11 }} 
+                  style={{ minHeight: 200, fontFamily: 'monospace', fontSize: 13 }} 
                   placeholder="John Doe, john@example.com, 9876543210, coe1, 2025, CS, Java;React, 85"
                   value={csvData}
                   onChange={(e) => setCsvData(e.target.value)}

@@ -163,7 +163,7 @@ export const EmptyState: React.FC<{
   icon: React.ReactNode; title: string; subtitle?: string;
 }> = ({ icon, title, subtitle }) => (
   <Box sx={{ textAlign: 'center', py: 8 }}>
-    <Box sx={{ fontSize: 48, color: 'text.secondary', mb: 2, opacity: 0.5 }}>{icon}</Box>
+    <Box sx={{ fontSize: 50, color: 'text.secondary', mb: 2, opacity: 0.5 }}>{icon}</Box>
     <Typography variant="h6" color="text.secondary" gutterBottom>{title}</Typography>
     {subtitle && <Typography variant="body2" color="text.secondary">{subtitle}</Typography>}
   </Box>

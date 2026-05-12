@@ -10,7 +10,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       {sidebarOpen && <Sidebar />}
       <div className="main">
         {/* Global Header */}
-        <div style={{ height: 60, borderBottom: '1px solid var(--g200)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 24px' }}>
+        {/* <div style={{ height: 60, borderBottom: '1px solid var(--g200)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 24px' }}>
           <div style={{ position: 'relative', cursor: 'pointer' }}>
             <div style={{ 
               width: 32, 
@@ -30,7 +30,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               right: -6,
               background: 'var(--red)',
               color: '#fff',
-              fontSize: 9,
+              fontSize: 11,
               fontWeight: 700,
               width: 14,
               height: 14,
@@ -41,7 +41,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               boxShadow: '0 0 0 2px #fff'
             }}>3</div>
           </div>
-        </div>
+        </div> */}
         <div style={{ flex: 1, overflowY: 'auto' }}>
           {children}
         </div>

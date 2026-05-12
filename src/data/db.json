@@ -25,7 +25,7 @@
       "role": "COE_LAB_HEAD",
       "status": "active",
       "coeScopeIds": [
-        "coe1"
+        1
       ],
       "avatar": "RV"
     },
@@ -45,39 +45,53 @@
       "role": "COE_COORDINATOR",
       "status": "active",
       "coeScopeIds": [
-        "coe1"
+        1
       ],
       "avatar": "KD"
     },
-    {
+     {
       "id": "u6",
-      "name": "manu",
-      "email": "manu@bridgelabz.com",
+      "name": "Shubham Chaudhari3",
+      "email": "shubham.chaudhari@bridgelabz.com",
       "role": "COE_LAB_HEAD",
       "status": "active",
       "coeScopeIds": [
-        "coe1"
+        1
       ],
-      "avatar": "AK"
+      "avatar": "SC"
     },
     {
       "id": "u7",
-      "name": "Neha",
-      "email": "neha@bridgelabz.com",
-      "role": "COE_COORDINATOR",
+      "name": "manu",
+      "email": "manu.saini@bridgelabz.com",
+      "role": "COE_LAB_HEAD",
       "status": "active",
       "coeScopeIds": [
-        "coe1"
+        1
       ],
-      "avatar": "NJ"
+      "avatar": "MS"
     }
   ],
   "coes": [
     {
-      "id": "coe1",
-      "name": "BridgeLabz Mumbai Center",
-      "location": "Mumbai",
-      "spoc": "Narayan Mahadevan",
+      "id": 1,
+      "name": "GLA-U",
+      "location": "Mathura",
+      "spoc": "Rohan Mokashi",
+      "studentsCount": 200
+    },
+     {
+      "id": 2,
+      "name": "SRMIST",
+      "location": "Chennai",
+      "spoc": "Rohan Mokashi",
+      "studentsCount": 200
+    },
+     {
+      "id": 3,
+      "name": "CHITKARA",
+      "location": "Chandigarh",
+      "spoc": "Rohan Mokashi",
       "studentsCount": 200
     }
   ],
@@ -129,7 +143,7 @@
   "hiringDrives": [
     {
       "id": "7a2in7zp",
-      "coeId": "coe1",
+      "coeId": 1,
       "driveName": "pune tech drive-2026",
       "date": "2026-05-11",
       "venue": "pune lab",
@@ -149,7 +163,7 @@
       "name": "Shubham",
       "email": "shubham@gmail.com",
       "phone": "1223333324",
-      "coeId": "coe1",
+      "coeId": 1,
       "graduationYear": 2025,
       "stream": "   CSE",
       "skills": [

@@ -88,7 +88,7 @@ export const DiscussionsPage: React.FC = () => {
           <span className="breadcrumb">Discussion Queue / <span>{pendingItems.length} pending contacts</span></span>
         </div>
         <div className="topbar-right">
-          <span className="badge mapping" style={{ fontSize: 11, padding: '4px 12px', borderRadius: 12 }}>{pendingItems.length} Pending</span>
+          <span className="badge mapping" style={{ fontSize: 13, padding: '4px 12px', borderRadius: 12 }}>{pendingItems.length} Pending</span>
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export const DiscussionsPage: React.FC = () => {
           <div style={{ display: 'flex', gap: 20, minHeight: 'calc(100vh - 48px)' }}>
             {/* Left Column: List */}
             <div style={{ width: 450, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--g500)', letterSpacing: '0.05em', marginBottom: 4 }}>CANDIDATES TO CONTACT</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--g500)', letterSpacing: '0.05em', marginBottom: 4 }}>CANDIDATES TO CONTACT</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {pendingItems.map(li => {
                   const cand = candidates.find(c => c.id === li.candidateId);
@@ -121,7 +121,7 @@ export const DiscussionsPage: React.FC = () => {
                     >
                       <div style={{ position: 'absolute', top: 16, right: 20 }}>
                         <span style={{ 
-                          fontSize: 10, 
+                          fontSize: 12, 
                           fontWeight: 700, 
                           padding: '2px 10px', 
                           borderRadius: 10, 
@@ -133,22 +133,22 @@ export const DiscussionsPage: React.FC = () => {
                       </div>
                       <div style={{ display: 'flex', gap: 16 }}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                          <div className="sb-avatar" style={{ width: 44, height: 44, background: 'var(--blue)', color: '#fff', fontSize: 15 }}>
+                          <div className="sb-avatar" style={{ width: 44, height: 44, background: 'var(--blue)', color: '#fff', fontSize: 17 }}>
                             {cand?.avatar || cand?.name.slice(0, 2).toUpperCase()}
                           </div>
                           <div style={{ width: 10, height: 10, borderRadius: '50%', background: prio.dot }} />
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 15 }}>{cand?.name}</div>
-                          <div style={{ fontSize: 11, color: 'var(--g500)', marginTop: 4 }}>
+                          <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 17 }}>{cand?.name}</div>
+                          <div style={{ fontSize: 13, color: 'var(--g500)', marginTop: 4 }}>
                             {cand?.stream} • {li.proposedTech} • {req?.requirementCode.split('-').pop()}
                           </div>
                           <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
-                            <div style={{ fontSize: 11, color: 'var(--navy)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <i className="ti ti-phone" style={{ fontSize: 14 }} /> {cand?.phone}
+                            <div style={{ fontSize: 13, color: 'var(--navy)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <i className="ti ti-phone" style={{ fontSize: 16 }} /> {cand?.phone}
                             </div>
-                            <div style={{ fontSize: 11, color: 'var(--navy)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <i className="ti ti-mail" style={{ fontSize: 14 }} /> {cand?.email}
+                            <div style={{ fontSize: 13, color: 'var(--navy)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <i className="ti ti-mail" style={{ fontSize: 16 }} /> {cand?.email}
                             </div>
                           </div>
                         </div>
@@ -161,7 +161,7 @@ export const DiscussionsPage: React.FC = () => {
 
             {/* Right Column: Detail Form */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--g500)', letterSpacing: '0.05em', marginBottom: 4 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--g500)', letterSpacing: '0.05em', marginBottom: 4 }}>
                 LOG DISCUSSION OUTCOME — {selectedCand?.name.toUpperCase()}
               </div>
               
@@ -170,10 +170,10 @@ export const DiscussionsPage: React.FC = () => {
                   
                   {/* Context Box */}
                   <div style={{ background: 'var(--g50)', borderRadius: 12, padding: 24, marginBottom: 30, border: '1px solid var(--g200)' }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--navy)' }}>
                       Mapped for: {selectedReq?.requirementCode}
                     </div>
-                    <div style={{ display: 'flex', gap: 24, marginTop: 10, fontSize: 12, color: 'var(--g600)' }}>
+                    <div style={{ display: 'flex', gap: 24, marginTop: 10, fontSize: 14, color: 'var(--g600)' }}>
                       <span>{selectedReq?.openPositions} positions</span>
                       <span>{selectedReq?.location}</span>
                       <span>Onboarding {selectedReq?.onboardingDate ? formatDate(selectedReq.onboardingDate) : 'TBD'}</span>
@@ -214,7 +214,7 @@ export const DiscussionsPage: React.FC = () => {
                             }}>
                               {outcome === o && <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--green)' }} />}
                             </div>
-                            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--navy)' }}>{o}</span>
+                            <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--navy)' }}>{o}</span>
                           </div>
                         ))}
                       </div>
@@ -252,7 +252,7 @@ export const DiscussionsPage: React.FC = () => {
                       style={{ 
                         width: '100%', 
                         height: 48, 
-                        fontSize: 15, 
+                        fontSize: 17, 
                         fontWeight: 700,
                         marginTop: 10,
                         borderRadius: 8,
@@ -269,12 +269,12 @@ export const DiscussionsPage: React.FC = () => {
           </div>
         ) : (
           <div style={{ height: 'calc(100vh - 150px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20 }}>
-            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--green-light)', color: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, border: '4px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--green-light)', color: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 42, border: '4px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
               <i className="ti ti-circle-check" />
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 22 }}>All caught up!</div>
-              <div style={{ color: 'var(--g500)', fontSize: 14, marginTop: 8, maxWidth: 300, lineHeight: 1.5 }}>
+              <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 24 }}>All caught up!</div>
+              <div style={{ color: 'var(--g500)', fontSize: 16, marginTop: 8, maxWidth: 300, lineHeight: 1.5 }}>
                 There are no more candidates pending for discussion at this moment.
               </div>
               <button 

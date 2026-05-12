@@ -39,17 +39,17 @@ export const AdminUsersPage: React.FC = () => {
                   <tr key={user.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div className="sb-avatar" style={{ width: 32, height: 32, fontSize: 10 }}>
+                        <div className="sb-avatar" style={{ width: 32, height: 32, fontSize: 12 }}>
                           {user.avatar || user.name.slice(0, 2)}
                         </div>
                         <div>
                           <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{user.name}</div>
-                          <div style={{ fontSize: 9, color: 'var(--g500)' }}>{user.email}</div>
+                          <div style={{ fontSize: 11, color: 'var(--g500)' }}>{user.email}</div>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <span className="badge active" style={{ fontSize: 9 }}>
+                      <span className="badge active" style={{ fontSize: 11 }}>
                         {formatRole(user.role)}
                       </span>
                     </td>
@@ -59,7 +59,7 @@ export const AdminUsersPage: React.FC = () => {
                       ) : (
                         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                           {user.coeScopeIds.map((coeId) => (
-                            <span key={coeId} className="badge draft" style={{ fontSize: 8 }}>
+                            <span key={coeId} className="badge draft" style={{ fontSize: 10 }}>
                               {getCoeName(coeId)}
                             </span>
                           ))}

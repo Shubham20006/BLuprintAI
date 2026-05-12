@@ -44,7 +44,7 @@ export const DashboardPage: React.FC = () => {
             <div className="panel-hd">
               <span className="panel-title"><i className="ti ti-file-description" aria-hidden="true" style={{marginRight: 5, color: 'var(--blue)'}} />Active Mandates</span>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <select className="form-select" style={{ width: 120, padding: '4px 8px', fontSize: 11 }}>
+                <select className="form-select" style={{ width: 120, padding: '4px 8px', fontSize: 13 }}>
                   <option>All Clients</option>
                 </select>
                 <button className="btn btn-ghost btn-sm"><i className="ti ti-download" aria-hidden="true" /> Export</button>
@@ -56,7 +56,7 @@ export const DashboardPage: React.FC = () => {
                 <tbody>
                   {requirements.slice(0, 5).map(req => (
                     <tr key={req.id}>
-                      <td style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--navy)', fontWeight: 600 }}>{req.requirementCode}</td>
+                      <td style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--navy)', fontWeight: 600 }}>{req.requirementCode}</td>
                       <td>{req.techStack}</td>
                       <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{req.openPositions}</td>
                       <td>{new Date(req.createdAt).toLocaleDateString()}</td>
@@ -80,7 +80,7 @@ export const DashboardPage: React.FC = () => {
       <div className="topbar">
         <div className="topbar-left"><span className="breadcrumb">Analytics / <span>MIS Dashboard</span></span></div>
         <div className="topbar-right">
-          <select className="form-select" style={{ width: 100, padding: '4px 8px', fontSize: 11 }}><option>This Month</option></select>
+          <select className="form-select" style={{ width: 100, padding: '4px 8px', fontSize: 13 }}><option>This Month</option></select>
           <button className="btn btn-ghost btn-sm"><i className="ti ti-download" aria-hidden="true" /> Export</button>
         </div>
       </div>
@@ -107,13 +107,13 @@ export const DashboardPage: React.FC = () => {
             <div className="panel" style={{ marginTop: 10 }}>
               <div className="panel-hd">
                 <span className="panel-title" style={{ color: 'var(--purple)' }}><i className="ti ti-robot" aria-hidden="true" style={{ marginRight: 4 }} />AI Weekly Summary</span>
-                <span style={{ fontSize: 10, color: 'var(--g500)' }}>Mon, 25 Nov 2025</span>
+                <span style={{ fontSize: 12, color: 'var(--g500)' }}>Mon, 25 Nov 2025</span>
               </div>
-              <div className="panel-body" style={{ padding: 10, fontSize: 11, color: 'var(--g500)', lineHeight: 1.6 }}>
+              <div className="panel-body" style={{ padding: 10, fontSize: 13, color: 'var(--g500)', lineHeight: 1.6 }}>
                 <div style={{ marginBottom: 6, color: 'var(--g900)', fontWeight: 500 }}>3 recommendations this week:</div>
-                <div style={{ padding: '5px 8px', background: 'var(--orange-light)', borderRadius: 5, marginBottom: 5, color: 'var(--orange)', fontSize: 10 }}><i className="ti ti-alert-triangle" aria-hidden="true" style={{ marginRight: 4 }} />Nov21-862 (AIML) at SLA risk — HOE review pending</div>
-                <div style={{ padding: '5px 8px', background: 'var(--green-light)', borderRadius: 5, marginBottom: 5, color: 'var(--green)', fontSize: 10 }}><i className="ti ti-trending-up" aria-hidden="true" style={{ marginRight: 4 }} />SRM COE placement rate improved 12% — prioritise for next mandate</div>
-                <div style={{ padding: '5px 8px', background: 'var(--blue-light)', borderRadius: 5, color: 'var(--navy)', fontSize: 10 }}><i className="ti ti-info-circle" aria-hidden="true" style={{ marginRight: 4 }} />5 LOIs pending signature &gt; 5 days — coordinate with COE team</div>
+                <div style={{ padding: '5px 8px', background: 'var(--orange-light)', borderRadius: 5, marginBottom: 5, color: 'var(--orange)', fontSize: 12 }}><i className="ti ti-alert-triangle" aria-hidden="true" style={{ marginRight: 4 }} />Nov21-862 (AIML) at SLA risk — HOE review pending</div>
+                <div style={{ padding: '5px 8px', background: 'var(--green-light)', borderRadius: 5, marginBottom: 5, color: 'var(--green)', fontSize: 12 }}><i className="ti ti-trending-up" aria-hidden="true" style={{ marginRight: 4 }} />SRM COE placement rate improved 12% — prioritise for next mandate</div>
+                <div style={{ padding: '5px 8px', background: 'var(--blue-light)', borderRadius: 5, color: 'var(--navy)', fontSize: 12 }}><i className="ti ti-info-circle" aria-hidden="true" style={{ marginRight: 4 }} />5 LOIs pending signature &gt; 5 days — coordinate with COE team</div>
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@ export const DashboardPage: React.FC = () => {
             <div className="panel" style={{ marginTop: 10 }}>
               <div className="panel-hd"><span className="panel-title">Tech Domain Distribution</span></div>
               <div className="panel-body" style={{ padding: 10 }}>
-                <table style={{ width: '100%', fontSize: 11 }}>
+                <table style={{ width: '100%', fontSize: 13 }}>
                   <tbody>
                     <tr style={{ borderBottom: '1px solid var(--g200)' }}><td style={{ padding: '5px 0', color: 'var(--g500)' }}>Java Full Stack</td><td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--navy)' }}>14 mandates</td><td style={{ textAlign: 'right' }}><span className="badge active">30%</span></td></tr>
                     <tr style={{ borderBottom: '1px solid var(--g200)' }}><td style={{ padding: '5px 0', color: 'var(--g500)' }}>.NET / C#</td><td style={{ textAlign: 'right', fontWeight: 600, color: 'var(--navy)' }}>11 mandates</td><td style={{ textAlign: 'right' }}><span className="badge mapping">23%</span></td></tr>

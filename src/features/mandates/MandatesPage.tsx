@@ -145,14 +145,14 @@ export const MandatesPage: React.FC = () => {
                     <tr key={m.id}>
                       <td>
                         <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{m.mandateName}</div>
-                        <div style={{ fontSize: 9, color: 'var(--g500)' }}>{m.contractRef}</div>
+                        <div style={{ fontSize: 11, color: 'var(--g500)' }}>{m.contractRef}</div>
                       </td>
                       <td>{client?.name || m.clientId}</td>
                       <td><span className="badge draft">{m.mandateType}</span></td>
                       <td>
                         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                           {m.locations.map((l) => (
-                            <span key={l} className="badge draft" style={{ fontSize: 8 }}>{l}</span>
+                            <span key={l} className="badge draft" style={{ fontSize: 10 }}>{l}</span>
                           ))}
                         </div>
                       </td>

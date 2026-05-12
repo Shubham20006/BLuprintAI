@@ -141,8 +141,8 @@ export const MappingsPage: React.FC = () => {
 
       <div className="content">
         <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Mappings</div>
-          <div style={{ fontSize: 12, color: 'var(--g500)' }}>{mappings.length} total mapping records</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Mappings</div>
+          <div style={{ fontSize: 14, color: 'var(--g500)' }}>{mappings.length} total mapping records</div>
         </div>
 
         <div className="panel">
@@ -179,16 +179,16 @@ export const MappingsPage: React.FC = () => {
                     return (
                       <tr key={m.id}>
                         <td>
-                          <div style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, color: 'var(--navy)' }}>
+                          <div style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>
                             {req?.requirementCode || m.requirementId}
                           </div>
                         </td>
                         <td>
                           <span className={`badge ${m.status === 'Draft' ? 'draft' : 'active'}`}>{m.status}</span>
                         </td>
-                        <td style={{ fontSize: 11, color: 'var(--g600)' }}>{formatDate(m.createdAt)}</td>
-                        <td style={{ fontSize: 11, color: 'var(--g600)' }}>{formatDate(m.updatedAt)}</td>
-                        <td style={{ fontSize: 11, color: 'var(--g500)', maxWidth: 160, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <td style={{ fontSize: 13, color: 'var(--g600)' }}>{formatDate(m.createdAt)}</td>
+                        <td style={{ fontSize: 13, color: 'var(--g600)' }}>{formatDate(m.updatedAt)}</td>
+                        <td style={{ fontSize: 13, color: 'var(--g500)', maxWidth: 160, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {m.notes || '—'}
                         </td>
                         <td style={{ textAlign: 'right' }}>
@@ -244,12 +244,12 @@ export const MappingsPage: React.FC = () => {
               </div>
 
               {requirement && (
-                <div style={{ background: remainingCap > 0 ? 'var(--blue-light)' : '#FEE2E2', color: remainingCap > 0 ? 'var(--blue)' : '#B91C1C', padding: '8px 12px', borderRadius: 6, fontSize: 11, marginBottom: 16 }}>
+                <div style={{ background: remainingCap > 0 ? 'var(--blue-light)' : '#FEE2E2', color: remainingCap > 0 ? 'var(--blue)' : '#B91C1C', padding: '8px 12px', borderRadius: 6, fontSize: 13, marginBottom: 16 }}>
                   {remainingCap > 0 ? `${remainingCap} of ${requirement.openPositions} positions available` : 'This requirement is at full capacity'}
                 </div>
               )}
 
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>
                 Select Candidates ({selectedCandidateIds.length} selected)
               </div>
               <div style={{ border: '1px solid var(--g300)', borderRadius: 6, maxHeight: 250, overflowY: 'auto', marginBottom: 16 }}>
@@ -287,17 +287,17 @@ export const MappingsPage: React.FC = () => {
                             <td style={{ textAlign: 'center' }}>
                               <input type="checkbox" checked={checked} readOnly style={{ cursor: 'pointer' }} disabled={c.status === 'Mapped' && currentUser?.role !== 'MIS_MANAGER'} />
                             </td>
-                            <td style={{ fontSize: 11, fontWeight: 600, color: 'var(--navy)' }}>
+                            <td style={{ fontSize: 13, fontWeight: 600, color: 'var(--navy)' }}>
                               {c.name}
-                              {c.status === 'Mapped' && <div style={{ fontSize: 8, color: 'var(--red)', fontWeight: 700 }}>CONFLICT</div>}
+                              {c.status === 'Mapped' && <div style={{ fontSize: 10, color: 'var(--red)', fontWeight: 700 }}>CONFLICT</div>}
                             </td>
-                            <td style={{ fontSize: 11, color: 'var(--g600)' }}>{coe?.name.split(' ')[0]}</td>
-                            <td style={{ fontSize: 11, color: dateMisaligned ? 'var(--red)' : 'var(--g600)', fontWeight: dateMisaligned ? 700 : 400 }}>
+                            <td style={{ fontSize: 13, color: 'var(--g600)' }}>{coe?.name.split(' ')[0]}</td>
+                            <td style={{ fontSize: 13, color: dateMisaligned ? 'var(--red)' : 'var(--g600)', fontWeight: dateMisaligned ? 700 : 400 }}>
                               {c.availabilityDate}
                               {dateMisaligned && <i className="ti ti-alert-triangle" style={{ marginLeft: 4 }} title="After onboarding date" />}
                             </td>
-                            <td style={{ fontSize: 11, fontWeight: 700, color: 'var(--green)' }}>{c.assessmentScore}%</td>
-                            <td><span className={`badge ${c.status === 'Mapped' ? 'active' : 'draft'}`} style={{ fontSize: 9 }}>{c.status}</span></td>
+                            <td style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>{c.assessmentScore}%</td>
+                            <td><span className={`badge ${c.status === 'Mapped' ? 'active' : 'draft'}`} style={{ fontSize: 11 }}>{c.status}</span></td>
                           </tr>
                         );
                       })}

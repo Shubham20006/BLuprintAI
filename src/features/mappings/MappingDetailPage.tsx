@@ -100,15 +100,15 @@ export const MappingDetailPage: React.FC = () => {
       <div className="content">
         <div style={{ background: 'var(--purple-light)', border: '1px solid rgba(90,45,130,.2)', borderRadius: 8, padding: '10px 14px', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--purple)' }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--purple)' }}>
             <i className="ti ti-sparkles" aria-hidden="true" style={{ marginRight: 4 }} />
             AI Mapping Engine — Claude 3.5 Sonnet via AWS Bedrock
           </div>
-          <div style={{ fontSize: 10, color: 'var(--g500)', marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: 'var(--g500)', marginTop: 2 }}>
             Ranked {mappedCandidates.length || 7} candidates from 3 COEs for {requirement.openPositions} {techShort} positions in {requirement.location} · Confidence: {confidence}%
           </div>
         </div>
-        <span className="badge" style={{ background: 'var(--purple-light)', color: 'var(--purple)', border: '1px solid rgba(90,45,130,.3)', fontSize: 10 }}>
+        <span className="badge" style={{ background: 'var(--purple-light)', color: 'var(--purple)', border: '1px solid rgba(90,45,130,.3)', fontSize: 12 }}>
           {confidence}% Confident
         </span>
       </div>
@@ -116,7 +116,7 @@ export const MappingDetailPage: React.FC = () => {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, alignItems: 'start' }}>
         {/* Left Column: Candidates */}
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--g500)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--g500)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 8 }}>
             AI Recommended Mapping
           </div>
           
@@ -143,7 +143,7 @@ export const MappingDetailPage: React.FC = () => {
                     <div className="score-fill" style={{ width: `${c.matchScore}%`, background: c.matchScore >= 90 ? 'var(--green)' : 'var(--blue)' }}></div>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, fontSize: 9, color: 'var(--g500)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, fontSize: 11, color: 'var(--g500)' }}>
                   <span>Tech: {c.techScore}%</span>
                   <span>Academic: {c.academicScore}%</span>
                   <span>COE: {c.coeScore}%</span>
@@ -161,14 +161,14 @@ export const MappingDetailPage: React.FC = () => {
 
         {/* Right Column: Details & Allocation */}
         <div>
-          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--g500)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--g500)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 8 }}>
             Mandate Details
           </div>
           <div className="panel" style={{ marginBottom: 8 }}>
             <div className="panel-body" style={{ padding: 10 }}>
-              <table style={{ width: '100%', fontSize: 11 }}>
+              <table style={{ width: '100%', fontSize: 13 }}>
                 <tbody>
-                  <tr><td style={{ color: 'var(--g500)', padding: '3px 0' }}>Requirement ID</td><td style={{ fontFamily: 'monospace', fontSize: 10, fontWeight: 600, color: 'var(--navy)' }}>{requirement.requirementCode}</td></tr>
+                  <tr><td style={{ color: 'var(--g500)', padding: '3px 0' }}>Requirement ID</td><td style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 600, color: 'var(--navy)' }}>{requirement.requirementCode}</td></tr>
                   <tr><td style={{ color: 'var(--g500)', padding: '3px 0' }}>Tech stack</td><td style={{ fontWeight: 600 }}>{techShort}</td></tr>
                   <tr><td style={{ color: 'var(--g500)', padding: '3px 0' }}>Positions</td><td style={{ fontWeight: 600, color: 'var(--navy)' }}>{requirement.openPositions} open</td></tr>
                   <tr><td style={{ color: 'var(--g500)', padding: '3px 0' }}>Location</td><td>{requirement.location}</td></tr>
@@ -178,7 +178,7 @@ export const MappingDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--g500)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--g500)', textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 8 }}>
             Mix &amp; Match COE Allocation
           </div>
           <div className="panel" style={{ marginBottom: 8 }}>
@@ -193,17 +193,17 @@ export const MappingDetailPage: React.FC = () => {
                   </div>
                 </div>
               ))}
-              <div style={{ fontSize: 10, color: 'var(--g500)', marginTop: 6 }}>
+              <div style={{ fontSize: 12, color: 'var(--g500)', marginTop: 6 }}>
                 <i className="ti ti-info-circle" aria-hidden="true" /> AI recommends mix-and-match to maximise COE performance balance.
               </div>
             </div>
           </div>
 
           <div style={{ background: 'var(--purple-light)', borderRadius: 6, padding: '8px 10px', border: '1px solid rgba(90,45,130,.15)' }}>
-            <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--purple)', marginBottom: 3 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--purple)', marginBottom: 3 }}>
               <i className="ti ti-robot" aria-hidden="true" /> AI Reasoning
             </div>
-            <div style={{ fontSize: 10, color: 'var(--g500)', lineHeight: 1.5 }}>
+            <div style={{ fontSize: 12, color: 'var(--g500)', lineHeight: 1.5 }}>
               {mappedCandidates[0]?.candidate?.name || 'The top candidate'} scores highest on {techShort} assessments ({mappedCandidates[0]?.techScore || 96}%) with strong proximity to {requirement.location}. Mix-and-match with {coeAllocations[1].name} ensures COE diversity and maintains fallback capacity.
             </div>
           </div>

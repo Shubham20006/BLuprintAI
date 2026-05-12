@@ -101,11 +101,11 @@ export const HiringDrivesPage: React.FC = () => {
                       </td>
                       <td>{coe?.name.split(' ').slice(0, 2).join(' ')}</td>
                       <td>{new Date(d.date).toLocaleDateString()}</td>
-                      <td style={{ color: 'var(--g500)', fontSize: 11 }}>{d.venue}</td>
+                      <td style={{ color: 'var(--g500)', fontSize: 13 }}>{d.venue}</td>
                       <td>
                         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                           {d.techCovered.map((t) => (
-                            <span key={t} className="badge loi" style={{ fontSize: 10, padding: '2px 6px' }}>{t}</span>
+                            <span key={t} className="badge loi" style={{ fontSize: 12, padding: '2px 6px' }}>{t}</span>
                           ))}
                         </div>
                       </td>
