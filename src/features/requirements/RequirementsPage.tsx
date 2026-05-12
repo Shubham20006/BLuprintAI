@@ -167,7 +167,9 @@ export const RequirementsPage: React.FC = () => {
     watch('mandateType');
 
   const selectedClient = clients.find(
-    (c) => c.id === watchedClient
+    (c) =>
+      c.id === watchedClient ||
+      c.name === watchedClient
   );
 
   const nextSeq = requirements.length + 101;
@@ -186,12 +188,16 @@ export const RequirementsPage: React.FC = () => {
     : 'Dec10';
 
   const previewId =
-    selectedClient &&
+    watchedClient &&
     watchedTech &&
     watchedEngagement &&
     watchedDate
       ? generateRequirementId(
-          selectedClient.shortCode,
+          selectedClient?.shortCode ||
+            watchedClient
+              .replace(/\s+/g, '')
+              .substring(0, 4)
+              .toUpperCase(),
           watchedMandateType || 'NEW',
           techShort,
           watchedEngagement,
@@ -205,7 +211,9 @@ export const RequirementsPage: React.FC = () => {
   ) => {
     try {
       const client = clients.find(
-        (c) => c.id === data.clientId
+        (c) =>
+          c.id === data.clientId ||
+          c.name === data.clientId
       );
 
       const reqTechShort =
@@ -220,16 +228,18 @@ export const RequirementsPage: React.FC = () => {
         })
         .replace(' ', '');
 
-      const reqCode = client
-        ? generateRequirementId(
-            client.shortCode,
-            data.mandateType,
-            reqTechShort,
-            data.engagementModel,
-            reqMonthDay,
-            nextSeq
-          )
-        : `REQ-${generateId()}`;
+      const reqCode = generateRequirementId(
+        client?.shortCode ||
+          data.clientId
+            .replace(/\s+/g, '')
+            .substring(0, 4)
+            .toUpperCase(),
+        data.mandateType,
+        reqTechShort,
+        data.engagementModel,
+        reqMonthDay,
+        nextSeq
+      );
 
       const mandateId = generateId();
 
@@ -282,6 +292,20 @@ export const RequirementsPage: React.FC = () => {
     }
   };
 
+  const autoCompleteProps = (
+    field: any
+  ) => ({
+    freeSolo: true,
+    value: field.value || '',
+    inputValue: field.value || '',
+    onInputChange: (_: any, value: string) => {
+      field.onChange(value);
+    },
+    onChange: (_: any, value: string) => {
+      field.onChange(value || '');
+    },
+  });
+
   return (
     <ThemeProvider theme={muiTheme}>
       <LocalizationProvider
@@ -331,6 +355,7 @@ export const RequirementsPage: React.FC = () => {
                     onSubmit={handleSubmit(onSubmit)}
                   >
                     <div className="form-grid">
+
                       {/* CLIENT */}
                       <div className="form-group">
                         <label className="form-label">
@@ -342,36 +367,12 @@ export const RequirementsPage: React.FC = () => {
                           name="clientId"
                           render={({ field }) => (
                             <Autocomplete
-                              freeSolo
-                              options={clients.map(
-                                (c) => ({
-                                  label: c.name,
-                                  value: c.id,
-                                })
+                              {...autoCompleteProps(
+                                field
                               )}
-                              value={
-                                clients.find(
-                                  (c) =>
-                                    c.id ===
-                                    field.value
-                                )?.name || ''
-                              }
-                              onInputChange={(
-                                _,
-                                value
-                              ) => {
-                                const matched =
-                                  clients.find(
-                                    (c) =>
-                                      c.name ===
-                                      value
-                                  );
-
-                                field.onChange(
-                                  matched?.id ||
-                                    value
-                                );
-                              }}
+                              options={clients.map(
+                                (c) => c.name
+                              )}
                               renderInput={(
                                 params
                               ) => (
@@ -396,23 +397,14 @@ export const RequirementsPage: React.FC = () => {
                           name="mandateType"
                           render={({ field }) => (
                             <Autocomplete
-                              freeSolo
+                              {...autoCompleteProps(
+                                field
+                              )}
                               options={[
                                 'NEW',
                                 'RENEW',
                                 'EXT',
                               ]}
-                              value={
-                                field.value || ''
-                              }
-                              onInputChange={(
-                                _,
-                                value
-                              ) =>
-                                field.onChange(
-                                  value
-                                )
-                              }
                               renderInput={(
                                 params
                               ) => (
@@ -437,24 +429,15 @@ export const RequirementsPage: React.FC = () => {
                         name="techStack"
                         render={({ field }) => (
                           <Autocomplete
-                            freeSolo
+                            {...autoCompleteProps(
+                              field
+                            )}
                             options={[
                               'DotNetStack — .NET / C#',
                               'JavaStack — Java Full Stack',
                               'AIMLDataEng — AI/ML & Data Engineering',
                               'Python — Python Development',
                             ]}
-                            value={
-                              field.value || ''
-                            }
-                            onInputChange={(
-                              _,
-                              value
-                            ) =>
-                              field.onChange(
-                                value
-                              )
-                            }
                             renderInput={(
                               params
                             ) => (
@@ -500,24 +483,15 @@ export const RequirementsPage: React.FC = () => {
                           name="engagementModel"
                           render={({ field }) => (
                             <Autocomplete
-                              freeSolo
+                              {...autoCompleteProps(
+                                field
+                              )}
                               options={[
                                 'FresherISA',
                                 'FresherFixed',
                                 'LateralISA',
                                 'UpSkilling',
                               ]}
-                              value={
-                                field.value || ''
-                              }
-                              onInputChange={(
-                                _,
-                                value
-                              ) =>
-                                field.onChange(
-                                  value
-                                )
-                              }
                               renderInput={(
                                 params
                               ) => (
@@ -623,24 +597,15 @@ export const RequirementsPage: React.FC = () => {
                         name="location"
                         render={({ field }) => (
                           <Autocomplete
-                            freeSolo
+                            {...autoCompleteProps(
+                              field
+                            )}
                             options={[
                               'Hyderabad, Telangana',
                               'Bangalore, Karnataka',
                               'Pune, Maharashtra',
                               'Chennai, Tamil Nadu',
                             ]}
-                            value={
-                              field.value || ''
-                            }
-                            onInputChange={(
-                              _,
-                              value
-                            ) =>
-                              field.onChange(
-                                value
-                              )
-                            }
                             renderInput={(
                               params
                             ) => (
@@ -709,7 +674,7 @@ export const RequirementsPage: React.FC = () => {
             </div>
 
             {/* RIGHT */}
-              <div>
+            <div>
               <div className="panel">
                 <div
                   className="panel-hd"
