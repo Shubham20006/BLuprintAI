@@ -70,6 +70,17 @@
         1
       ],
       "avatar": "MS"
+    },
+     {
+      "id": "u8",
+      "name": "Gunjan Sharma",
+      "email": "gunjan.sharma@bridgelabz.com",
+      "role": "COE_LAB_HEAD",
+      "status": "active",
+      "coeScopeIds": [
+        1
+      ],
+      "avatar": "GS"
     }
   ],
   "coes": [
