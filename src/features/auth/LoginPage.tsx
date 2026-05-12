@@ -301,7 +301,6 @@ const handleGoogleSuccess = async (credentialResponse: any) => {
             style={{
               marginTop: 'auto',
               fontSize: 14,
-              color: '#4A6FA5',
               position: 'relative',
             }}
           >
