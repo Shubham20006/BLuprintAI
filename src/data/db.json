@@ -81,6 +81,17 @@
         1
       ],
       "avatar": "GS"
+    },
+     {
+      "id": "u9",
+      "name": "Akshay Jangra",
+      "email": "akshay.jangra@bridgelabz.com",
+      "role": "COE_LAB_HEAD",
+      "status": "active",
+      "coeScopeIds": [
+        1
+      ],
+      "avatar": "AJ"
     }
   ],
   "coes": [
