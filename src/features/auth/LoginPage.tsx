@@ -477,6 +477,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 theme="outline"
                 size="large"
+                width="400"
               />
             </div>
 
