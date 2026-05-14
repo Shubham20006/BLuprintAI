@@ -77,12 +77,13 @@ export interface Client {
   tags: string[];
   accountOwner: string;
   shortCode: string;
+  status: string;
 }
 
 export interface Mandate {
   id: string;
   clientId: string;
-  mandateName: string;
+  companyName: string;
   mandateType: string;
   contractRef: string;
   startDate: string;
@@ -92,11 +93,13 @@ export interface Mandate {
   status: MandateStatus;
   createdAt: string;
   createdBy: string;
+  shortName:string;
 }
 
 export interface Requirement {
   id: string;
   mandateId: string;
+  companyName: string;
   requirementCode: string;
   techStack: string;
   intakeType: string;
@@ -125,7 +128,7 @@ export interface HiringDrive {
 
 export interface Candidate {
   id: string;
-  coeId: string;
+  coeId: number;
   name: string;
   email: string;
   phone: string;
@@ -133,7 +136,7 @@ export interface Candidate {
   stream: string;
   skills: string[];
   resumeLink: string;
-  assessmentScore: number;
+  cgpa: number;
   status: CandidateStatus;
   externalKey: string;
   availabilityDate: string;

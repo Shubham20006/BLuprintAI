@@ -41,7 +41,7 @@ export const MappingsPage: React.FC = () => {
 
   const filteredCandidates = candidates.filter((c) =>
     !currentUser || !can.isCOEScoped(currentUser.role) ||
-    currentUser.coeScopeIds.includes(c.coeId)
+    currentUser.coeScopeIds.some(id => String(id) === String(c.coeId))
   );
 
   const filtered = mappings.filter((m) => {
@@ -260,7 +260,7 @@ export const MappingsPage: React.FC = () => {
                       <th>Name</th>
                       <th>COE</th>
                       <th>Availability</th>
-                      <th>Score</th>
+                      <th>CGPA</th>
                       <th>Status</th>
                     </tr>
                   </thead>
@@ -268,7 +268,7 @@ export const MappingsPage: React.FC = () => {
                     {filteredCandidates
                       .filter((c) => ['Selected','Proposed'].includes(c.status) || (currentUser?.role === 'MIS_MANAGER' && c.status === 'Mapped'))
                       .map((c) => {
-                        const coe = coes.find((co) => co.id === c.coeId);
+                        const coe = coes.find((co) => Number(co.id) === Number(c.coeId));
                         const checked = selectedCandidateIds.includes(c.id);
                         const dateMisaligned = requirement && c.availabilityDate > requirement.onboardingDate;
                         return (
@@ -291,12 +291,12 @@ export const MappingsPage: React.FC = () => {
                               {c.name}
                               {c.status === 'Mapped' && <div style={{ fontSize: 10, color: 'var(--red)', fontWeight: 700 }}>CONFLICT</div>}
                             </td>
-                            <td style={{ fontSize: 13, color: 'var(--g600)' }}>{coe?.name.split(' ')[0]}</td>
-                            <td style={{ fontSize: 13, color: dateMisaligned ? 'var(--red)' : 'var(--g600)', fontWeight: dateMisaligned ? 700 : 400 }}>
+                            <td style={{ fontSize: 13, fontWeight: 500, color: 'var(--navy)' }}>{coe?.name.split(' ')[0]}</td>
+                            <td style={{ fontSize: 13, color: dateMisaligned ? 'var(--red)' : 'var(--navy)', fontWeight: dateMisaligned ? 700 : 500 }}>
                               {c.availabilityDate}
                               {dateMisaligned && <i className="ti ti-alert-triangle" style={{ marginLeft: 4 }} title="After onboarding date" />}
                             </td>
-                            <td style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>{c.assessmentScore}%</td>
+                            <td style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>{c.cgpa}</td>
                             <td><span className={`badge ${c.status === 'Mapped' ? 'active' : 'draft'}`} style={{ fontSize: 11 }}>{c.status}</span></td>
                           </tr>
                         );

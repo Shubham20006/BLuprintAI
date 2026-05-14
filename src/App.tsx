@@ -19,6 +19,7 @@ import { DiscussionsPage } from './features/discussions/DiscussionsPage';
 import { LOITrackerPage } from './features/loi/LOITrackerPage';
 import { AdminUsersPage } from './features/admin/AdminUsersPage';
 import type { UserRole } from './types';
+import { ClientsPage } from './features/mandates/ClientsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -78,6 +79,11 @@ const AppRoutes: React.FC = () => {
       <Route path="/mandates" element={
         <RoleGuard allowedRoles={['MIS_MANAGER', 'ACCOUNT_MANAGER']}>
           <MandatesPage />
+        </RoleGuard>
+      } />
+       <Route path="/clients" element={
+        <RoleGuard allowedRoles={['MIS_MANAGER', 'ACCOUNT_MANAGER']}>
+          <ClientsPage />
         </RoleGuard>
       } />
 

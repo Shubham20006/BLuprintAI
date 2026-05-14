@@ -83,7 +83,10 @@ export const useCreateHiringDrive = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: Partial<HiringDrive>) => api.post<HiringDrive>('/hiringDrives', data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['hiringDrives'] }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['hiringDrives'] });
+      await qc.refetchQueries({ queryKey: ['hiringDrives'] });
+    },
   });
 };
 
@@ -96,18 +99,51 @@ export const useCandidate = (id: string) =>
 
 export const useCreateCandidate = () => {
   const qc = useQueryClient();
+
   return useMutation({
-    mutationFn: (data: Partial<Candidate>) => api.post<Candidate>('/candidates', data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['candidates'] }),
+    mutationFn: (
+      data: Partial<Candidate>
+    ) =>
+      api.post<Candidate>(
+        '/candidates',
+        data
+      ),
+
+    onSuccess: async () => {
+      await qc.invalidateQueries({
+        queryKey: ['candidates'],
+      });
+
+      await qc.refetchQueries({
+        queryKey: ['candidates'],
+      });
+    },
   });
 };
-
 export const useUpdateCandidate = () => {
   const qc = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ id, ...data }: Partial<Candidate> & { id: string }) =>
-      api.patch<Candidate>(`/candidates/${id}`, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['candidates'] }),
+    mutationFn: ({
+      id,
+      ...data
+    }: Partial<Candidate> & {
+      id: string;
+    }) =>
+      api.patch<Candidate>(
+        `/candidates/${id}`,
+        data
+      ),
+
+    onSuccess: async () => {
+      await qc.invalidateQueries({
+        queryKey: ['candidates'],
+      });
+
+      await qc.refetchQueries({
+        queryKey: ['candidates'],
+      });
+    },
   });
 };
 

@@ -62,8 +62,52 @@ export const DashboardPage: React.FC = () => {
                       <td>{new Date(req.createdAt).toLocaleDateString()}</td>
                       <td>{req.location || 'Remote'}</td>
                       <td><span className={`badge ${req.status === 'active' ? 'active' : 'draft'}`}>{req.status}</span></td>
-                      <td><button className="btn btn-ghost btn-sm"><i className="ti ti-eye" aria-hidden="true" /></button></td>
-                    </tr>
+<td>
+  <div
+    style={{
+      display: 'flex',
+      gap: 6,
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}
+  >
+    {/* VIEW */}
+    <button
+      className="btn btn-ghost btn-sm"
+      onClick={() =>
+        navigate('/requirements', {
+          state: {
+            requirement: req,
+            mode: 'view',
+          },
+        })
+      }
+    >
+      <i
+        className="ti ti-eye"
+        aria-hidden="true"
+      />
+    </button>
+
+    {/* EDIT */}
+    <button
+      className="btn btn-ghost btn-sm"
+      onClick={() =>
+        navigate('/requirements', {
+          state: {
+            requirement: req,
+            mode: 'edit',
+          },
+        })
+      }
+    >
+      <i
+        className="ti ti-pencil"
+        aria-hidden="true"
+      />
+    </button>
+  </div>
+</td>                    </tr>
                   ))}
                 </tbody>
               </table>
@@ -100,8 +144,9 @@ export const DashboardPage: React.FC = () => {
               <div className="panel-body" style={{ padding: 10 }}>
                 <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--navy)', width: '100%' }}><span className="funnel-lbl">Total Open Positions</span><span className="funnel-val">{totalOpen}</span></div></div>
                 <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--blue)', width: '85%' }}><span className="funnel-lbl">Mapped</span><span className="funnel-val">{totalFilled}</span></div></div>
-                <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--teal)', width: '70%' }}><span className="funnel-lbl">LOI Issued</span><span className="funnel-val">{totalSigned}</span></div></div>
-                <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--green)', width: '55%' }}><span className="funnel-lbl">CFP Started</span><span className="funnel-val">{totalCFP}</span></div></div>
+                <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--teal)', width: '70%' }}><span className="funnel-lbl">LOI Issued</span><span className="funnel-val">{totalSent}</span></div></div>
+                <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--green)', width: '70%' }}><span className="funnel-lbl">LOI Signed</span><span className="funnel-val">{totalSigned}</span></div></div>
+                <div className="funnel-step"><div className="funnel-bar" style={{ background: 'var(--blue)', width: '55%' }}><span className="funnel-lbl">CFP Started</span><span className="funnel-val">{totalCFP}</span></div></div>
               </div>
             </div>
             <div className="panel" style={{ marginTop: 10 }}>

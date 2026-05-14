@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate } from 'react-router-dom';
+import {
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 
 import {
@@ -15,7 +18,7 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
+import { api } from '../../api/client';
 import dayjs from 'dayjs';
 
 import {
@@ -31,14 +34,24 @@ import {
 } from '../../utils';
 
 const schema = z.object({
-  clientId: z.string().min(1, 'Required'),
+  companyName: z.string().min(1, 'Required'),
+
+  shortName: z.string().min(1, 'Required'),
+
   mandateType: z.string().min(1, 'Required'),
+
   techStack: z.string().min(1, 'Required'),
+
   openPositions: z.coerce.number().min(1, 'Min 1'),
+
   engagementModel: z.string().min(1, 'Required'),
+
   mandateDate: z.string().min(1, 'Required'),
+
   onboardingDate: z.string().min(1, 'Required'),
+
   location: z.string().min(1, 'Required'),
+
   notes: z.string().optional(),
 });
 
@@ -85,6 +98,7 @@ const muiTheme = createTheme({
         paper: {
           borderRadius: 10,
           border: '1px solid #E2E8F0',
+
           boxShadow:
             '0 8px 24px rgba(15,23,42,0.08)',
         },
@@ -117,6 +131,8 @@ const muiTheme = createTheme({
 export const RequirementsPage: React.FC = () => {
   const navigate = useNavigate();
 
+  const locationState = useLocation();
+
   const { enqueueSnackbar } = useSnackbar();
 
   const { data: clients = [] } = useClients();
@@ -132,29 +148,82 @@ export const RequirementsPage: React.FC = () => {
     isPending,
   } = useCreateRequirement();
 
+  // GET MODE + DATA
+  const mode =
+    locationState.state?.mode || 'create';
+
+  const requirement =
+    locationState.state?.requirement;
+
+  const isView = mode === 'view';
+
+  const isEdit = mode === 'edit';
+
   const {
     handleSubmit,
     watch,
-    formState: { errors },
     register,
     control,
+    reset,
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
 
     defaultValues: {
-      clientId: '',
-      mandateType: 'NEW',
-      techStack: 'DotNetStack — .NET / C#',
-      engagementModel: 'FresherISA',
-      location: 'Hyderabad, Telangana',
-      onboardingDate: '2026-02-01',
-      mandateDate: '2025-12-10',
-      openPositions: 5,
+      companyName: '',
+      shortName: '',
+      mandateType: '',
+      techStack: '',
+      engagementModel: '',
+      location: '',
+      onboardingDate: '',
+      mandateDate: '',
+      openPositions: 0,
       notes: '',
     },
   });
 
-  const watchedClient = watch('clientId');
+  // PREFILL DATA
+  useEffect(() => {
+    if (requirement) {
+      // console.log('Requirement object:', requirement);
+      reset({
+        companyName:
+          requirement.companyName || '',
+
+        shortName:
+          requirement.requirementCode
+            ?.split('-')[0] || '',
+
+        mandateType:
+          requirement.requirementCode
+            ?.split('-')[1] || '',
+
+        techStack:
+          requirement.techStack || '',
+
+        engagementModel:
+          requirement.intakeType || '',
+
+        location:
+          requirement.location || '',
+
+        onboardingDate:
+          requirement.onboardingDate || '',
+
+        mandateDate:
+          requirement.createdAt
+            ?.split('T')[0] || '',
+
+        openPositions:
+          requirement.openPositions || 0,
+
+        notes: '',
+      });
+    }
+  }, [requirement, reset]);
+
+  const watchedShortName =
+    watch('shortName');
 
   const watchedTech = watch('techStack');
 
@@ -166,55 +235,108 @@ export const RequirementsPage: React.FC = () => {
   const watchedMandateType =
     watch('mandateType');
 
-  const selectedClient = clients.find(
-    (c) =>
-      c.id === watchedClient ||
-      c.name === watchedClient
-  );
-
   const nextSeq = requirements.length + 101;
 
   const techShort = watchedTech
     ? watchedTech.split(' ')[0]
-    : 'DotNetStack';
+    : '-';
 
   const monthDay = watchedDate
     ? new Date(watchedDate)
-        .toLocaleString('en-US', {
-          month: 'short',
-          day: '2-digit',
-        })
-        .replace(' ', '')
-    : 'Dec10';
+      .toLocaleString('en-US', {
+        month: 'short',
+        day: '2-digit',
+      })
+      .replace(' ', '')
+    : '-';
 
   const previewId =
-    watchedClient &&
-    watchedTech &&
-    watchedEngagement &&
-    watchedDate
+    watchedShortName &&
+      watchedTech &&
+      watchedEngagement &&
+      watchedDate
       ? generateRequirementId(
-          selectedClient?.shortCode ||
-            watchedClient
-              .replace(/\s+/g, '')
-              .substring(0, 4)
-              .toUpperCase(),
-          watchedMandateType || 'NEW',
-          techShort,
-          watchedEngagement,
-          monthDay,
-          nextSeq
-        )
+        watchedShortName
+          .replace(/\s+/g, ''),
+        watchedMandateType || '-',
+        techShort,
+        watchedEngagement,
+        monthDay,
+        nextSeq
+      )
       : '—';
 
   const onSubmit = async (
     data: FormValues
   ) => {
     try {
-      const client = clients.find(
+      // EDIT OPERATION
+      if (isEdit && requirement) {
+        const updatedRequirement = {
+          ...requirement,
+
+          techStack: data.techStack,
+
+          intakeType:
+            data.engagementModel,
+
+          location: data.location,
+
+          onboardingDate:
+            data.onboardingDate,
+
+          openPositions:
+            data.openPositions,
+        };
+
+        await api.put(
+          `/requirements/${requirement.id}`,
+          updatedRequirement
+        );
+
+        enqueueSnackbar(
+          'Requirement updated successfully',
+          {
+            variant: 'success',
+          }
+        );
+
+        navigate('/dashboard');
+
+        return;
+      }
+
+      // CREATE OPERATION
+      let client = clients.find(
         (c) =>
-          c.id === data.clientId ||
-          c.name === data.clientId
+          c.name.toLowerCase() ===
+          data.companyName.toLowerCase()
       );
+
+      if (!client) {
+        const newClient = {
+          id: generateId(),
+
+          name: data.companyName,
+
+          shortCode: data.shortName
+            .replace(/\s+/g, '')
+            .toUpperCase(),
+
+          tags: [],
+
+          accountOwner: 'u1',
+
+          status: 'active',
+        };
+
+        await api.post(
+          '/clients',
+          newClient
+        );
+
+        client = newClient;
+      }
 
       const reqTechShort =
         data.techStack.split(' ')[0];
@@ -228,49 +350,79 @@ export const RequirementsPage: React.FC = () => {
         })
         .replace(' ', '');
 
-      const reqCode = generateRequirementId(
-        client?.shortCode ||
-          data.clientId
-            .replace(/\s+/g, '')
-            .substring(0, 4)
-            .toUpperCase(),
-        data.mandateType,
-        reqTechShort,
-        data.engagementModel,
-        reqMonthDay,
-        nextSeq
-      );
+      const reqCode =
+        generateRequirementId(
+          data.shortName
+            .replace(/\s+/g, ''),
+
+          data.mandateType,
+
+          reqTechShort,
+
+          data.engagementModel,
+
+          reqMonthDay,
+
+          nextSeq
+        );
 
       const mandateId = generateId();
 
       await createMandate({
         id: mandateId,
-        mandateName: `Mandate for ${
-          client?.name || 'Client'
-        } - ${reqTechShort}`,
-        clientId: data.clientId,
-        mandateType: data.mandateType as any,
+
+        companyName: data.companyName,
+
+        clientId: client.id,
+
+        mandateType:
+          data.mandateType as any,
+
         startDate: data.mandateDate,
-        onboardingDate: data.onboardingDate,
+
+        onboardingDate:
+          data.onboardingDate,
+
         locations: [data.location],
+
         status: 'active',
-        createdAt: new Date().toISOString(),
+
+        createdAt:
+          new Date().toISOString(),
+
         createdBy: 'u1',
       });
 
       await createReq({
         id: generateId(),
+
         mandateId: mandateId,
+        companyName: data.companyName,
+
         requirementCode: reqCode,
+
         techStack: data.techStack,
-        intakeType: data.engagementModel,
+
+        intakeType:
+          data.engagementModel,
+
         expLevel: 'Fresher',
+
         location: data.location,
-        onboardingDate: data.onboardingDate,
-        openPositions: data.openPositions,
+
+        onboardingDate:
+          data.onboardingDate,
+
+        openPositions:
+          data.openPositions,
+
         filledPositions: 0,
+
         status: 'active',
-        createdAt: new Date().toISOString(),
+
+        createdAt:
+          new Date().toISOString(),
+
         targetCoeIds: [],
       });
 
@@ -282,9 +434,13 @@ export const RequirementsPage: React.FC = () => {
       );
 
       navigate('/dashboard');
-    } catch {
+    } catch (error) {
+      console.error(error);
+
       enqueueSnackbar(
-        'Error creating mandate',
+        isEdit
+          ? 'Error updating requirement'
+          : 'Error creating mandate',
         {
           variant: 'error',
         }
@@ -296,14 +452,26 @@ export const RequirementsPage: React.FC = () => {
     field: any
   ) => ({
     freeSolo: true,
+
     value: field.value || '',
+
     inputValue: field.value || '',
-    onInputChange: (_: any, value: string) => {
+
+    onInputChange: (
+      _: any,
+      value: string
+    ) => {
       field.onChange(value);
     },
-    onChange: (_: any, value: string) => {
+
+    onChange: (
+      _: any,
+      value: string
+    ) => {
       field.onChange(value || '');
     },
+
+    disabled: isView,
   });
 
   return (
@@ -316,7 +484,13 @@ export const RequirementsPage: React.FC = () => {
             <div className="topbar-left">
               <span className="breadcrumb">
                 Mandates /{' '}
-                <span>Create New Mandate</span>
+                <span>
+                  {isView
+                    ? 'View Mandate'
+                    : isEdit
+                      ? 'Edit Mandate'
+                      : 'Create New Mandate'}
+                </span>
               </span>
             </div>
 
@@ -334,7 +508,8 @@ export const RequirementsPage: React.FC = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns:
+                '1fr 1fr',
               gap: '1rem',
               margin: '1rem',
               alignItems: 'start',
@@ -352,20 +527,22 @@ export const RequirementsPage: React.FC = () => {
                 <div className="panel-body">
                   <form
                     id="req-form"
-                    onSubmit={handleSubmit(onSubmit)}
+                    onSubmit={handleSubmit(
+                      onSubmit
+                    )}
                   >
                     <div className="form-grid">
-
-                      {/* CLIENT */}
                       <div className="form-group">
                         <label className="form-label">
-                          Client
+                          Company
                         </label>
 
                         <Controller
                           control={control}
-                          name="clientId"
-                          render={({ field }) => (
+                          name="companyName"
+                          render={({
+                            field,
+                          }) => (
                             <Autocomplete
                               {...autoCompleteProps(
                                 field
@@ -378,7 +555,7 @@ export const RequirementsPage: React.FC = () => {
                               ) => (
                                 <TextField
                                   {...params}
-                                  placeholder="Select Client..."
+                                  placeholder="Enter Company Name..."
                                 />
                               )}
                             />
@@ -386,7 +563,28 @@ export const RequirementsPage: React.FC = () => {
                         />
                       </div>
 
-                      {/* MANDATE TYPE */}
+                      <div className="form-group">
+                        <label className="form-label">
+                          Short Name
+                        </label>
+
+                        <input
+                          className="form-input"
+                          disabled={isView}
+                          style={{
+                            height: 34,
+                            fontSize: 13,
+                            padding:
+                              '6px 12px',
+                          }}
+                          {...register(
+                            'shortName'
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-grid">
                       <div className="form-group">
                         <label className="form-label">
                           Mandate type
@@ -395,7 +593,9 @@ export const RequirementsPage: React.FC = () => {
                         <Controller
                           control={control}
                           name="mandateType"
-                          render={({ field }) => (
+                          render={({
+                            field,
+                          }) => (
                             <Autocomplete
                               {...autoCompleteProps(
                                 field
@@ -404,6 +604,7 @@ export const RequirementsPage: React.FC = () => {
                                 'NEW',
                                 'RENEW',
                                 'EXT',
+                                'SUB',
                               ]}
                               renderInput={(
                                 params
@@ -416,9 +617,29 @@ export const RequirementsPage: React.FC = () => {
                           )}
                         />
                       </div>
+
+                      <div className="form-group">
+                        <label className="form-label">
+                          Open positions
+                        </label>
+
+                        <input
+                          className="form-input"
+                          type="number"
+                          disabled={isView}
+                          style={{
+                            height: 34,
+                            fontSize: 13,
+                            padding:
+                              '6px 12px',
+                          }}
+                          {...register(
+                            'openPositions'
+                          )}
+                        />
+                      </div>
                     </div>
 
-                    {/* TECH STACK */}
                     <div className="form-group">
                       <label className="form-label">
                         Technology stack
@@ -436,6 +657,8 @@ export const RequirementsPage: React.FC = () => {
                               'DotNetStack — .NET / C#',
                               'JavaStack — Java Full Stack',
                               'AIMLDataEng — AI/ML & Data Engineering',
+                              'DeepTech',
+                              'Backend',
                               'Python — Python Development',
                             ]}
                             renderInput={(
@@ -451,28 +674,6 @@ export const RequirementsPage: React.FC = () => {
                     </div>
 
                     <div className="form-grid">
-                      {/* OPEN POSITIONS */}
-                      <div className="form-group">
-                        <label className="form-label">
-                          Open positions
-                        </label>
-
-                        <input
-                          className="form-input"
-                          type="number"
-                          style={{
-                            height: 34,
-                            fontSize: 13,
-                            padding:
-                              '6px 12px',
-                          }}
-                          {...register(
-                            'openPositions'
-                          )}
-                        />
-                      </div>
-
-                      {/* ENGAGEMENT */}
                       <div className="form-group">
                         <label className="form-label">
                           Engagement model
@@ -503,9 +704,39 @@ export const RequirementsPage: React.FC = () => {
                           )}
                         />
                       </div>
+
+                      <div className="form-group">
+                        <label className="form-label">
+                          Job location
+                        </label>
+
+                        <Controller
+                          control={control}
+                          name="location"
+                          render={({ field }) => (
+                            <Autocomplete
+                              {...autoCompleteProps(
+                                field
+                              )}
+                              options={[
+                                'Hyderabad, Telangana',
+                                'Bangalore, Karnataka',
+                                'Pune, Maharashtra',
+                                'Chennai, Tamil Nadu',
+                              ]}
+                              renderInput={(
+                                params
+                              ) => (
+                                <TextField
+                                  {...params}
+                                />
+                              )}
+                            />
+                          )}
+                        />
+                      </div>
                     </div>
 
-                    {/* DATES */}
                     <div className="form-grid">
                       <div className="form-group">
                         <label className="form-label">
@@ -517,11 +748,12 @@ export const RequirementsPage: React.FC = () => {
                           name="mandateDate"
                           render={({ field }) => (
                             <DatePicker
+                              disabled={isView}
                               value={
                                 field.value
                                   ? dayjs(
-                                      field.value
-                                    )
+                                    field.value
+                                  )
                                   : null
                               }
                               onChange={(
@@ -530,8 +762,8 @@ export const RequirementsPage: React.FC = () => {
                                 field.onChange(
                                   value
                                     ? value.format(
-                                        'YYYY-MM-DD'
-                                      )
+                                      'YYYY-MM-DD'
+                                    )
                                     : ''
                                 )
                               }
@@ -556,11 +788,12 @@ export const RequirementsPage: React.FC = () => {
                           name="onboardingDate"
                           render={({ field }) => (
                             <DatePicker
+                              disabled={isView}
                               value={
                                 field.value
                                   ? dayjs(
-                                      field.value
-                                    )
+                                    field.value
+                                  )
                                   : null
                               }
                               onChange={(
@@ -569,8 +802,8 @@ export const RequirementsPage: React.FC = () => {
                                 field.onChange(
                                   value
                                     ? value.format(
-                                        'YYYY-MM-DD'
-                                      )
+                                      'YYYY-MM-DD'
+                                    )
                                     : ''
                                 )
                               }
@@ -586,39 +819,6 @@ export const RequirementsPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* LOCATION */}
-                    <div className="form-group">
-                      <label className="form-label">
-                        Job location
-                      </label>
-
-                      <Controller
-                        control={control}
-                        name="location"
-                        render={({ field }) => (
-                          <Autocomplete
-                            {...autoCompleteProps(
-                              field
-                            )}
-                            options={[
-                              'Hyderabad, Telangana',
-                              'Bangalore, Karnataka',
-                              'Pune, Maharashtra',
-                              'Chennai, Tamil Nadu',
-                            ]}
-                            renderInput={(
-                              params
-                            ) => (
-                              <TextField
-                                {...params}
-                              />
-                            )}
-                          />
-                        )}
-                      />
-                    </div>
-
-                    {/* NOTES */}
                     <div
                       className="form-group"
                       style={{
@@ -631,8 +831,8 @@ export const RequirementsPage: React.FC = () => {
 
                       <textarea
                         className="form-input"
+                        disabled={isView}
                         rows={2}
-                        placeholder="Any specific requirements..."
                         style={{
                           fontSize: 13,
                           padding:
@@ -662,14 +862,18 @@ export const RequirementsPage: React.FC = () => {
                   Cancel
                 </button>
 
-                <button
-                  type="submit"
-                  form="req-form"
-                  className="btn btn-primary"
-                  disabled={isPending}
-                >
-                  Create Mandate
-                </button>
+                {!isView && (
+                  <button
+                    type="submit"
+                    form="req-form"
+                    className="btn btn-primary"
+                    disabled={isPending}
+                  >
+                    {isEdit
+                      ? 'Update Mandate'
+                      : 'Create Mandate'}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -753,7 +957,7 @@ export const RequirementsPage: React.FC = () => {
 
                               {i <
                                 arr.length -
-                                  1 && '-'}
+                                1 && '-'}
                             </React.Fragment>
                           )
                         )}
@@ -842,7 +1046,7 @@ export const RequirementsPage: React.FC = () => {
                                 'monospace',
                             }}
                           >
-                            {selectedClient?.shortCode ||
+                            {watchedShortName ||
                               '—'}
                           </td>
                         </tr>

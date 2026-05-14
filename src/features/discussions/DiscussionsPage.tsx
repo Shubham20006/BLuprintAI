@@ -75,9 +75,9 @@ export const DiscussionsPage: React.FC = () => {
     }
   };
 
-  const getPriority = (score: number) => {
-    if (score >= 85) return { label: 'Urgent', color: '#EF4444', bg: '#FEE2E2', dot: '#EF4444' };
-    if (score >= 75) return { label: 'High', color: '#F59E0B', bg: '#FEF3C7', dot: '#F59E0B' };
+  const getPriority = (cgpa: number) => {
+    if (cgpa >= 8.5) return { label: 'Urgent', color: '#EF4444', bg: '#FEE2E2', dot: '#EF4444' };
+    if (cgpa >= 7.5) return { label: 'High', color: '#F59E0B', bg: '#FEF3C7', dot: '#F59E0B' };
     return { label: 'Normal', color: '#3B82F6', bg: '#DBEAFE', dot: '#10B981' };
   };
 
@@ -103,7 +103,7 @@ export const DiscussionsPage: React.FC = () => {
                   const cand = candidates.find(c => c.id === li.candidateId);
                   const mapping = mappings.find(m => m.id === li.mappingId);
                   const req = requirements.find(r => r.id === mapping?.requirementId);
-                  const prio = getPriority(cand?.assessmentScore || 70);
+                  const prio = getPriority(cand?.cgpa || 7.0);
                   const isActive = selectedItemId === li.id;
 
                   return (

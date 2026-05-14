@@ -33,7 +33,7 @@ export const HiringDrivesPage: React.FC = () => {
   });
 
   const scopedDrives = currentUser && can.isCOEScoped(currentUser.role) && currentUser.coeScopeIds.length
-    ? drives.filter((d) => currentUser.coeScopeIds.includes(d.coeId))
+    ? drives.filter((d) => currentUser.coeScopeIds.some(id => String(id) === String(d.coeId)))
     : drives;
 
   const onSubmit = async (data: FormValues) => {
@@ -93,7 +93,7 @@ export const HiringDrivesPage: React.FC = () => {
               </thead>
               <tbody>
                 {scopedDrives.map((d) => {
-                  const coe = coes.find((c) => c.id === d.coeId);
+                  const coe = coes.find((c) => String(c.id) === String(d.coeId));
                   return (
                     <tr key={d.id}>
                       <td>

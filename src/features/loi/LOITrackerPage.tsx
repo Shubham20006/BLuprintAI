@@ -155,7 +155,7 @@ export const LOITrackerPage: React.FC = () => {
         <div className="topbar-right">
           {canIssue && (
             <button className="btn btn-primary" onClick={() => setOpen(true)}>
-              <i className="ti ti-send" /> Issue Bulk LOI
+              <i className="ti ti-send" /> Issue LOI
             </button>
           )}
         </div>
@@ -255,7 +255,7 @@ export const LOITrackerPage: React.FC = () => {
         <div className="modal-overlay">
           <div className="modal-content" style={{ maxWidth: 600 }}>
             <div className="modal-hd">
-              <span className="modal-title">Issue Bulk LOI</span>
+              <span className="modal-title">Issue LOI</span>
               <button className="btn-close" onClick={() => setOpen(false)}>×</button>
             </div>
             <div className="modal-body" style={{ padding: 0 }}>

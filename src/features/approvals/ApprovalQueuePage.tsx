@@ -111,7 +111,7 @@ export const ApprovalQueuePage: React.FC<ApprovalQueueProps> = ({ queueType }) =
                   const avgScore = mItems.length > 0 
                     ? Math.round(mItems.reduce((acc, li) => {
                         const cand = candidates.find(c => c.id === li.candidateId);
-                        return acc + (cand?.assessmentScore || 0);
+                        return acc + ((cand?.cgpa || 0) * 10);
                       }, 0) / mItems.length)
                     : 85;
 
@@ -164,19 +164,19 @@ export const ApprovalQueuePage: React.FC<ApprovalQueueProps> = ({ queueType }) =
                           <tr>
                             <th>Candidate</th>
                             <th>COE</th>
-                            <th>Score</th>
+                            <th>CGPA</th>
                             <th>Override</th>
                           </tr>
                         </thead>
                         <tbody>
                           {selectedItems.map((item) => {
                             const cand = candidates.find(c => c.id === item.candidateId);
-                            const coe = coes.find(c => c.id === cand?.coeId);
+                            const coe = coes.find(c => Number(c.id) === Number(cand?.coeId));
                             return (
                               <tr key={item.id}>
                                 <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{cand?.name}</td>
                                 <td>{coe?.name.split(' ')[0]}</td>
-                                <td style={{ fontWeight: 700, color: 'var(--green)' }}>{cand?.assessmentScore}%</td>
+                                <td style={{ fontWeight: 700, color: 'var(--green)' }}>{cand?.cgpa}</td>
                                 <td><i className="ti ti-minus" style={{ color: 'var(--g300)' }} /></td>
                               </tr>
                             );

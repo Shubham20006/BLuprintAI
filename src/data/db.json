@@ -2,7 +2,7 @@
   "users": [
     {
       "id": "u1",
-      "name": "Shubham Chaudhari",
+      "name": "MIS Manager",
       "email": "mis@bl.com",
       "role": "MIS_MANAGER",
       "status": "active",
@@ -11,7 +11,7 @@
     },
     {
       "id": "u2",
-      "name": "Shubham Chaudhari2",
+      "name": "Account Manager",
       "email": "am@bl.com",
       "role": "ACCOUNT_MANAGER",
       "status": "active",
@@ -20,7 +20,7 @@
     },
     {
       "id": "u3",
-      "name": "Shubham Chaudhari3",
+      "name": "coe Lab Head",
       "email": "clh@bl.com",
       "role": "COE_LAB_HEAD",
       "status": "active",
@@ -31,7 +31,7 @@
     },
     {
       "id": "u4",
-      "name": "HOE Demo",
+      "name": "Head Of Engineering",
       "email": "hoe@bl.com",
       "role": "HEAD_OF_ENGINEERING",
       "status": "active",
@@ -40,7 +40,7 @@
     },
     {
       "id": "u5",
-      "name": "Coordinator Demo",
+      "name": "coe Coordinator",
       "email": "coord@bl.com",
       "role": "COE_COORDINATOR",
       "status": "active",
@@ -49,9 +49,9 @@
       ],
       "avatar": "KD"
     },
-     {
+    {
       "id": "u6",
-      "name": "Shubham Chaudhari3",
+      "name": "Shubham Chaudhari",
       "email": "shubham.chaudhari@bridgelabz.com",
       "role": "COE_LAB_HEAD",
       "status": "active",
@@ -71,7 +71,7 @@
       ],
       "avatar": "MS"
     },
-     {
+    {
       "id": "u8",
       "name": "Gunjan Sharma",
       "email": "gunjan.sharma@bridgelabz.com",
@@ -82,7 +82,7 @@
       ],
       "avatar": "GS"
     },
-     {
+    {
       "id": "u9",
       "name": "Akshay Jangra",
       "email": "akshay.jangra@bridgelabz.com",
@@ -102,14 +102,14 @@
       "spoc": "Rohan Mokashi",
       "studentsCount": 200
     },
-     {
+    {
       "id": 2,
       "name": "SRMIST",
       "location": "Chennai",
       "spoc": "Rohan Mokashi",
       "studentsCount": 200
     },
-     {
+    {
       "id": 3,
       "name": "CHITKARA",
       "location": "Chandigarh",
@@ -121,6 +121,7 @@
     {
       "id": "cl1",
       "name": "Apexon",
+      "status": "active",
       "tags": [
         "Fintech",
         "Enterprise"
@@ -132,7 +133,7 @@
   "mandates": [
     {
       "id": "6ruhf1hd",
-      "mandateName": "Mandate for Apexon - DotNetStack",
+      "companyName": "Apexon",
       "clientId": "cl1",
       "mandateType": "NEW",
       "startDate": "2025-12-10",
@@ -149,6 +150,7 @@
     {
       "id": "u1s770by",
       "mandateId": "6ruhf1hd",
+      "companyName": "Apexon",
       "requirementCode": "APEX-NEW-DotNetStack-FresherISA-Dec10-101",
       "techStack": "DotNetStack — .NET / C#",
       "intakeType": "FresherISA",
@@ -193,7 +195,7 @@
         "java",
         "c#"
       ],
-      "assessmentScore": 75,
+      "cgpa": 7.5,
       "status": "LOI Signed",
       "resumeLink": "",
       "externalKey": "COE1-8qspb3zf",

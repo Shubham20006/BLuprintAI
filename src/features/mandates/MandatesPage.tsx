@@ -11,7 +11,7 @@ import { formatDate, generateId } from '../../utils';
 import type { Mandate } from '../../types';
 
 const schema = z.object({
-  mandateName: z.string().min(3, 'Required'),
+  companyName: z.string().min(3, 'Required'),
   clientId: z.string().min(1, 'Select a client'),
   mandateType: z.string().min(1, 'Required'),
   contractRef: z.string().optional(),
@@ -37,14 +37,14 @@ export const MandatesPage: React.FC = () => {
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { mandateName: '', clientId: '', mandateType: 'NEW', contractRef: '', startDate: '', onboardingDate: '', locations: '', notes: '' },
+    defaultValues: { companyName: '', clientId: '', mandateType: 'NEW', contractRef: '', startDate: '', onboardingDate: '', locations: '', notes: '' },
   });
 
   const handleOpen = (mandate?: Mandate) => {
     if (mandate) {
       setEditing(mandate);
       reset({
-        mandateName: mandate.mandateName,
+        companyName: mandate.companyName,
         clientId: mandate.clientId,
         mandateType: mandate.mandateType,
         contractRef: mandate.contractRef,
@@ -55,7 +55,7 @@ export const MandatesPage: React.FC = () => {
       });
     } else {
       setEditing(null);
-      reset({ mandateName: '', clientId: '', mandateType: 'NEW', contractRef: '', startDate: '', onboardingDate: '', locations: '', notes: '' });
+      reset({ companyName: '', clientId: '', mandateType: 'NEW', contractRef: '', startDate: '', onboardingDate: '', locations: '', notes: '' });
     }
     setOpen(true);
   };
@@ -83,7 +83,7 @@ export const MandatesPage: React.FC = () => {
   };
 
   const filtered = mandates.filter((m) =>
-    m.mandateName.toLowerCase().includes(search.toLowerCase()) ||
+    m.companyName.toLowerCase().includes(search.toLowerCase()) ||
     clients.find((c) => c.id === m.clientId)?.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -144,7 +144,7 @@ export const MandatesPage: React.FC = () => {
                   return (
                     <tr key={m.id}>
                       <td>
-                        <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{m.mandateName}</div>
+                        <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{m.companyName}</div>
                         <div style={{ fontSize: 11, color: 'var(--g500)' }}>{m.contractRef}</div>
                       </td>
                       <td>{client?.name || m.clientId}</td>
@@ -199,8 +199,8 @@ export const MandatesPage: React.FC = () => {
               <div className="modal-bd">
                 <div className="form-group">
                   <label className="form-label">Mandate Name</label>
-                  <input {...register('mandateName')} className={`form-input ${errors.mandateName ? 'error' : ''}`} />
-                  {errors.mandateName && <span className="error-text">{errors.mandateName.message}</span>}
+                  <input {...register('companyName')} className={`form-input ${errors.companyName ? 'error' : ''}`} />
+                  {errors.companyName && <span className="error-text">{errors.companyName.message}</span>}
                 </div>
                 <div className="form-grid">
                   <div className="form-group">
