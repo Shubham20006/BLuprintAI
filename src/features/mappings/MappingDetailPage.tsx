@@ -35,7 +35,7 @@ export const MappingDetailPage: React.FC = () => {
 
   const mappedCandidates = lineItems.map((li) => {
     const candidate = candidates.find((c) => c.id === li.candidateId);
-    const coe = coes.find((c) => c.id === candidate?.coeId);
+    const coe = coes.find((c) => Number(c.id) === Number(candidate?.coeId));
     return {
       ...li,
       candidate,
