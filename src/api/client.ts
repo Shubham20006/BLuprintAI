@@ -1,5 +1,5 @@
 // Base URL for the new Express & MongoDB backend
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'https://bluprint-ai.onrender.com';
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');
