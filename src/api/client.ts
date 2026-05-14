@@ -1,193 +1,140 @@
-import dbData from '../data/db.json';
+// Base URL for the new Express & MongoDB backend
+const API_BASE_URL = 'http://localhost:5000';
 
-// In-memory store initialized from db.json
-let store: any = { ...dbData };
-
-// Helper to simulate network delay
-const delay = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const getHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
 
 export const api = {
   get: async <T>(
     url: string,
     params?: Record<string, any>
   ): Promise<T> => {
-    await delay(100);
+    const resource = url.startsWith('/') ? url.slice(1) : url;
+    
+    // Construct query string if params exist
+    let queryString = '';
+    if (params) {
+      const searchParams = new URLSearchParams();
+      Object.keys(params).forEach((key) => {
+        if (params[key] !== undefined && params[key] !== null) {
+          searchParams.append(key, String(params[key]));
+        }
+      });
+      const query = searchParams.toString();
+      if (query) {
+        queryString = `?${query}`;
+      }
+    }
 
-    const resource = url.startsWith('/')
-      ? url.slice(1)
-      : url;
+    const response = await fetch(`${API_BASE_URL}/api/${resource}${queryString}`, {
+      method: 'GET',
+      headers: getHeaders(),
+    });
 
-    const parts = resource.split('/');
-
-    const key = parts[0];
-
-    const id = parts[1];
-
-    if (!store[key]) {
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
       throw {
-        message: `Resource ${key} not found`,
-        status: 404,
+        message: errorData.message || `Failed to GET ${resource}`,
+        status: response.status,
       };
     }
 
-    let data = [...store[key]];
-
-    // Handle single item
-    if (id) {
-      const item = data.find(
-        (i: any) => i.id === id
-      );
-
-      if (!item) {
-        throw {
-          message: `Item ${id} not found in ${key}`,
-          status: 404,
-        };
-      }
-
-      return item as T;
-    }
-
-    // Handle filtering
-    if (params) {
-      Object.keys(params).forEach((p) => {
-        if (
-          params[p] !== undefined &&
-          params[p] !== null
-        ) {
-          data = data.filter(
-            (item: any) =>
-              String(item[p]) ===
-              String(params[p])
-          );
-        }
-      });
-    }
-
-    return data as T;
+    return response.json();
   },
 
   post: async <T>(
     url: string,
     payload: any
   ): Promise<T> => {
-    await delay(100);
+    const resource = url.startsWith('/') ? url.slice(1) : url;
 
-    const key = url.startsWith('/')
-      ? url.slice(1)
-      : url;
+    const response = await fetch(`${API_BASE_URL}/api/${resource}`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(payload),
+    });
 
-    if (!store[key]) {
-      store[key] = [];
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw {
+        message: errorData.message || `Failed to POST ${resource}`,
+        status: response.status,
+      };
     }
 
-    const newItem = {
-      ...payload,
-
-      id:
-        payload.id ||
-        Math.random()
-          .toString(36)
-          .substring(2, 10),
-
-      createdAt:
-        payload.createdAt ||
-        new Date().toISOString(),
-    };
-
-    store[key] = [
-      ...store[key],
-      newItem,
-    ];
-
-    return newItem as T;
+    return response.json();
   },
 
   patch: async <T>(
     url: string,
     payload: any
   ): Promise<T> => {
-    await delay(100);
+    const resource = url.startsWith('/') ? url.slice(1) : url;
 
-    const parts = (
-      url.startsWith('/')
-        ? url.slice(1)
-        : url
-    ).split('/');
+    const response = await fetch(`${API_BASE_URL}/api/${resource}`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify(payload),
+    });
 
-    const key = parts[0];
-
-    const id = parts[1];
-
-    if (!store[key]) {
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
       throw {
-        message: `Resource ${key} not found`,
-        status: 404,
+        message: errorData.message || `Failed to PATCH ${resource}`,
+        status: response.status,
       };
     }
 
-    const index = store[key].findIndex(
-      (i: any) => i.id === id
-    );
-
-    if (index === -1) {
-      throw {
-        message: `Item ${id} not found`,
-        status: 404,
-      };
-    }
-
-    const updatedItem = {
-      ...store[key][index],
-      ...payload,
-      updatedAt:
-        new Date().toISOString(),
-    };
-
-    const newList = [...store[key]];
-
-    newList[index] = updatedItem;
-
-    store[key] = newList;
-
-    return updatedItem as T;
+    return response.json();
   },
 
   put: async <T>(
     url: string,
     payload: any
   ): Promise<T> => {
-    return api.patch<T>(url, payload);
+    const resource = url.startsWith('/') ? url.slice(1) : url;
+
+    const response = await fetch(`${API_BASE_URL}/api/${resource}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw {
+        message: errorData.message || `Failed to PUT ${resource}`,
+        status: response.status,
+      };
+    }
+
+    return response.json();
   },
 
   delete: async (
     url: string
   ): Promise<any> => {
-    await delay(100);
+    const resource = url.startsWith('/') ? url.slice(1) : url;
 
-    const parts = (
-      url.startsWith('/')
-        ? url.slice(1)
-        : url
-    ).split('/');
+    const response = await fetch(`${API_BASE_URL}/api/${resource}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
 
-    const key = parts[0];
-
-    const id = parts[1];
-
-    if (!store[key]) {
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
       throw {
-        message: `Resource ${key} not found`,
-        status: 404,
+        message: errorData.message || `Failed to DELETE ${resource}`,
+        status: response.status,
       };
     }
 
-    store[key] = store[key].filter(
-      (i: any) => i.id !== id
-    );
-
-    return { success: true };
+    return response.json();
   },
 };
 

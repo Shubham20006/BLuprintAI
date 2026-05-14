@@ -23,50 +23,34 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
 
-    if (!Array.isArray(users)) {
-      setError('System error: User data is not available.');
-      return;
-    }
+    try {
+      const response = await fetch('http://localhost:5000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const user = users.find((u) => u.email === email);
+      const data = await response.json();
 
-    if (user) {
-      setCurrentUser(user);
-      navigate('/dashboard');
-    } else {
-      setError('Invalid email or password');
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        setCurrentUser(data.user);
+        navigate('/dashboard');
+      } else {
+        setError(data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Connection to server failed');
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    try {
-      if (!credentialResponse.credential) {
-        setError('Google authentication failed');
-        return;
-      }
-
-      const decoded: GoogleUser = jwtDecode(
-        credentialResponse.credential
-      );
-
-      // SAME LOGIN FLOW AS NORMAL LOGIN
-      const existingUser = users.find(
-        (u) => u.email === decoded.email
-      );
-
-      if (existingUser) {
-        setCurrentUser(existingUser);
-        navigate('/dashboard');
-      } else {
-        setError('No account found for this Google email');
-      }
-    } catch (err) {
-      console.error(err);
-      setError('Google login failed');
-    }
+    setError('Google login is temporarily disabled while we secure the backend. Please use email/password.');
   };
 
   return (
