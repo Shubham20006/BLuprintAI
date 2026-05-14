@@ -23,51 +23,51 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
 
- const handleSignIn = (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!Array.isArray(users)) {
-    setError('System error: User data is not available.');
-    return;
-  }
-
-  const user = users.find((u) => u.email === email);
-
-  if (user) {
-    setCurrentUser(user);
-    navigate('/dashboard');
-  } else {
-    setError('Invalid email or password');
-  }
-};
-
-const handleGoogleSuccess = async (credentialResponse: any) => {
-  try {
-    if (!credentialResponse.credential) {
-      setError('Google authentication failed');
+    if (!Array.isArray(users)) {
+      setError('System error: User data is not available.');
       return;
     }
 
-    const decoded: GoogleUser = jwtDecode(
-      credentialResponse.credential
-    );
+    const user = users.find((u) => u.email === email);
 
-    // SAME LOGIN FLOW AS NORMAL LOGIN
-    const existingUser = users.find(
-      (u) => u.email === decoded.email
-    );
-
-    if (existingUser) {
-      setCurrentUser(existingUser);
+    if (user) {
+      setCurrentUser(user);
       navigate('/dashboard');
     } else {
-      setError('No account found for this Google email');
+      setError('Invalid email or password');
     }
-  } catch (err) {
-    console.error(err);
-    setError('Google login failed');
-  }
-};
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      if (!credentialResponse.credential) {
+        setError('Google authentication failed');
+        return;
+      }
+
+      const decoded: GoogleUser = jwtDecode(
+        credentialResponse.credential
+      );
+
+      // SAME LOGIN FLOW AS NORMAL LOGIN
+      const existingUser = users.find(
+        (u) => u.email === decoded.email
+      );
+
+      if (existingUser) {
+        setCurrentUser(existingUser);
+        navigate('/dashboard');
+      } else {
+        setError('No account found for this Google email');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Google login failed');
+    }
+  };
 
   return (
     <div
@@ -302,6 +302,7 @@ const handleGoogleSuccess = async (credentialResponse: any) => {
               marginTop: 'auto',
               fontSize: 14,
               position: 'relative',
+              color: "white"
             }}
           >
             © 2026 BridgeLabz Solutions Private Limited
@@ -411,7 +412,7 @@ const handleGoogleSuccess = async (credentialResponse: any) => {
                 type="submit"
                 className="btn btn-primary"
                 style={{
-                  fontWeight:600,
+                  fontWeight: 600,
                   width: '100%',
                   justifyContent: 'center',
                   padding: 12,
