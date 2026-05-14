@@ -28,7 +28,7 @@ export const ClientsPage: React.FC = () => {
   return (
     <>
       <div className="topbar">
-        <div className="topbar-left">
+        <div className="topbar-left" style={{color:"black"}}>
           <span>
             Clients ({clients.length})
           </span>
@@ -130,9 +130,6 @@ export const ClientsPage: React.FC = () => {
                     Short Code
                   </th>
 
-                  <th>
-                    Tags
-                  </th>
 
                   <th
                     style={{
@@ -172,33 +169,6 @@ export const ClientsPage: React.FC = () => {
                       >
                         {client.shortCode}
                       </span>
-                    </td>
-
-                    {/* TAGS */}
-                    <td>
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: 4,
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        {client.tags?.map(
-                          (
-                            tag: string
-                          ) => (
-                            <span
-                              key={tag}
-                              className="badge draft"
-                              style={{
-                                fontSize: 10,
-                              }}
-                            >
-                              {tag}
-                            </span>
-                          )
-                        )}
-                      </div>
                     </td>
 
                     {/* STATUS */}

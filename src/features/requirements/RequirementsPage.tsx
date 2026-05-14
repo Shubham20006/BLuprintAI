@@ -26,6 +26,7 @@ import {
   useCreateRequirement,
   useCreateMandate,
   useRequirements,
+  useUpdateRequirement,
 } from '../../api/hooks';
 
 import {
@@ -145,8 +146,15 @@ export const RequirementsPage: React.FC = () => {
 
   const {
     mutateAsync: createReq,
-    isPending,
+    isPending: isCreating,
   } = useCreateRequirement();
+
+  const {
+    mutateAsync: updateReq,
+    isPending: isUpdating,
+  } = useUpdateRequirement();
+
+  const isPending = isCreating || isUpdating;
 
   // GET MODE + DATA
   const mode =
@@ -272,27 +280,33 @@ export const RequirementsPage: React.FC = () => {
     try {
       // EDIT OPERATION
       if (isEdit && requirement) {
+        const reqTechShort = data.techStack.split(' ')[0];
+        const reqMonthDay = new Date(data.mandateDate)
+          .toLocaleString('en-US', { month: 'short', day: '2-digit' })
+          .replace(' ', '');
+        const reqSeqStr = requirement.requirementCode?.split('-').pop();
+        const reqSeq = reqSeqStr ? parseInt(reqSeqStr) : nextSeq;
+
+        const reqCode = generateRequirementId(
+          data.shortName.replace(/\s+/g, ''),
+          data.mandateType,
+          reqTechShort,
+          data.engagementModel,
+          reqMonthDay,
+          reqSeq
+        );
+
         const updatedRequirement = {
           ...requirement,
-
+          requirementCode: reqCode,
           techStack: data.techStack,
-
-          intakeType:
-            data.engagementModel,
-
+          intakeType: data.engagementModel,
           location: data.location,
-
-          onboardingDate:
-            data.onboardingDate,
-
-          openPositions:
-            data.openPositions,
+          onboardingDate: data.onboardingDate,
+          openPositions: data.openPositions,
         };
 
-        await api.put(
-          `/requirements/${requirement.id}`,
-          updatedRequirement
-        );
+        await updateReq({ id: requirement.id, ...updatedRequirement });
 
         enqueueSnackbar(
           'Requirement updated successfully',
@@ -571,6 +585,7 @@ export const RequirementsPage: React.FC = () => {
                         <input
                           className="form-input"
                           disabled={isView}
+                          placeholder="e.g. APEX"
                           style={{
                             height: 34,
                             fontSize: 13,
@@ -611,6 +626,7 @@ export const RequirementsPage: React.FC = () => {
                               ) => (
                                 <TextField
                                   {...params}
+                                  placeholder="Select Mandate Type..."
                                 />
                               )}
                             />
@@ -627,6 +643,7 @@ export const RequirementsPage: React.FC = () => {
                           className="form-input"
                           type="number"
                           disabled={isView}
+                          placeholder="e.g. 10"
                           style={{
                             height: 34,
                             fontSize: 13,
@@ -666,6 +683,7 @@ export const RequirementsPage: React.FC = () => {
                             ) => (
                               <TextField
                                 {...params}
+                                placeholder="Select Tech Stack..."
                               />
                             )}
                           />
@@ -698,6 +716,7 @@ export const RequirementsPage: React.FC = () => {
                               ) => (
                                 <TextField
                                   {...params}
+                                  placeholder="Select Engagement Model..."
                                 />
                               )}
                             />
@@ -729,6 +748,7 @@ export const RequirementsPage: React.FC = () => {
                               ) => (
                                 <TextField
                                   {...params}
+                                  placeholder="Select Job Location..."
                                 />
                               )}
                             />
@@ -833,6 +853,7 @@ export const RequirementsPage: React.FC = () => {
                         className="form-input"
                         disabled={isView}
                         rows={2}
+                        placeholder="Add any specific notes..."
                         style={{
                           fontSize: 13,
                           padding:

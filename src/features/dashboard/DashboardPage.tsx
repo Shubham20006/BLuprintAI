@@ -52,11 +52,12 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div style={{ padding: 0 }}>
               <table className="tbl">
-                <thead><tr><th>Requirement ID</th><th>Tech Stack</th><th>Positions</th><th>Mandate Date</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
+                <thead><tr><th>Requirement ID</th><th>Short Name</th><th>Tech Stack</th><th>Positions</th><th>Mandate Date</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
                 <tbody>
                   {requirements.slice(0, 5).map(req => (
                     <tr key={req.id}>
                       <td style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--navy)', fontWeight: 600 }}>{req.requirementCode}</td>
+                      <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{req.requirementCode.split('-')[0]}</td>
                       <td>{req.techStack}</td>
                       <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{req.openPositions}</td>
                       <td>{new Date(req.createdAt).toLocaleDateString()}</td>

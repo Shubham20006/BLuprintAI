@@ -103,11 +103,11 @@ export const CandidatesPage: React.FC = () => {
       name: '',
       email: '',
       phone: '',
-      coeId: 0,
-      graduationYear: 2025,
+      coeId: '' as any,
+      graduationYear: '' as any,
       stream: '',
       skills: '',
-      cgpa: 7.5,
+      cgpa: '' as any,
     },
   });
 
@@ -288,11 +288,11 @@ export const CandidatesPage: React.FC = () => {
         name: '',
         email: '',
         phone: '',
-        coeId: 0,
-        graduationYear: 2026,
+        coeId: '' as any,
+        graduationYear: '' as any,
         stream: '',
         skills: '',
-        cgpa: 7.5,
+        cgpa: '' as any,
       });
     }
 
@@ -866,6 +866,7 @@ export const CandidatesPage: React.FC = () => {
                       <input
                         {...field}
                         type="number"
+                        placeholder="Graduation Year (e.g. 2025)"
                         className="form-input"
                       />
                     )}
@@ -916,6 +917,7 @@ export const CandidatesPage: React.FC = () => {
                         {...field}
                         type="number"
                         step="0.1"
+                        placeholder="CGPA (out of 10)"
                         className="form-input"
                       />
                     )}

@@ -158,7 +158,10 @@ export const useCreateMapping = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: Partial<Mapping>) => api.post<Mapping>('/mappings', data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['mappings'] }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['mappings'] });
+      await qc.refetchQueries({ queryKey: ['mappings'] });
+    },
   });
 };
 
@@ -167,8 +170,9 @@ export const useUpdateMapping = () => {
   return useMutation({
     mutationFn: ({ id, ...data }: Partial<Mapping> & { id: string }) =>
       api.patch<Mapping>(`/mappings/${id}`, data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['mappings'] });
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['mappings'] });
+      await qc.refetchQueries({ queryKey: ['mappings'] });
     },
   });
 };
@@ -208,9 +212,11 @@ export const useCreateApproval = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: Partial<Approval>) => api.post<Approval>('/approvals', data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['approvals'] });
-      qc.invalidateQueries({ queryKey: ['mappings'] });
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['approvals'] });
+      await qc.invalidateQueries({ queryKey: ['mappings'] });
+      await qc.refetchQueries({ queryKey: ['approvals'] });
+      await qc.refetchQueries({ queryKey: ['mappings'] });
     },
   });
 };
