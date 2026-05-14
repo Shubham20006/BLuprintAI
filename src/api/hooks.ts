@@ -24,6 +24,18 @@ export const useCOE = (id: string) =>
 export const useClients = () =>
   useQuery({ queryKey: ['clients'], queryFn: () => api.get<Client[]>('/clients') });
 
+export const useUpdateClient = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...data }: Partial<Client> & { id: string }) =>
+      api.patch<Client>(`/clients/${id}`, data),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['clients'] });
+      await qc.refetchQueries({ queryKey: ['clients'] });
+    },
+  });
+};
+
 // ─── Mandates ─────────────────────────────────────────────────────────────────
 export const useMandates = (params?: Record<string, unknown>) =>
   useQuery({ queryKey: ['mandates', params], queryFn: () => api.get<Mandate[]>('/mandates', params) });

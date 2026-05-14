@@ -27,6 +27,7 @@ import {
   useCreateMandate,
   useRequirements,
   useUpdateRequirement,
+  useUpdateClient,
 } from '../../api/hooks';
 
 import {
@@ -153,6 +154,10 @@ export const RequirementsPage: React.FC = () => {
     mutateAsync: updateReq,
     isPending: isUpdating,
   } = useUpdateRequirement();
+
+  const {
+    mutateAsync: updateClient,
+  } = useUpdateClient();
 
   const isPending = isCreating || isUpdating;
 
@@ -307,6 +312,14 @@ export const RequirementsPage: React.FC = () => {
         };
 
         await updateReq({ id: requirement.id, ...updatedRequirement });
+
+        const client = clients.find((c) => c.name.toLowerCase() === data.companyName.toLowerCase());
+        if (client) {
+          await updateClient({
+            id: client.id,
+            shortCode: data.shortName.toUpperCase().replace(/\s+/g, ''),
+          });
+        }
 
         enqueueSnackbar(
           'Requirement updated successfully',

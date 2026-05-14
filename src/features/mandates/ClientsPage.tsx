@@ -127,10 +127,8 @@ export const ClientsPage: React.FC = () => {
                   </th>
 
                   <th>
-                    Short Code
+                    Client Short Name
                   </th>
-
-
                   <th
                     style={{
                       borderTopRightRadius: 10,
