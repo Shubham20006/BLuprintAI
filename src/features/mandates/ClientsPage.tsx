@@ -69,7 +69,6 @@ export const ClientsPage: React.FC = () => {
                   color: 'var(--g400)',
                 }}
               />
-
               <input
                 type="text"
                 className="form-input"
