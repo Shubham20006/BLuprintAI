@@ -2,15 +2,18 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '../../store';
 import { useRequirements, useCandidates, useCOEs, useLOIs } from '../../api/hooks';
+import { PageLoader } from '../../components/shared';
 
 export const DashboardPage: React.FC = () => {
   const { currentUser } = useSessionStore();
   const navigate = useNavigate();
   
-  const { data: requirements = [] } = useRequirements();
-  const { data: candidates = [] } = useCandidates();
-  const { data: coes = [] } = useCOEs();
-  const { data: lois = [] } = useLOIs();
+  const { data: requirements = [], isLoading: loadingReqs } = useRequirements();
+  const { data: candidates = [], isLoading: loadingCands } = useCandidates();
+  const { data: coes = [], isLoading: loadingCOEs } = useCOEs();
+  const { data: lois = [], isLoading: loadingLOIs } = useLOIs();
+
+  const isLoading = loadingReqs || loadingCands || loadingCOEs || loadingLOIs;
 
   const totalOpen = requirements.reduce((s, r) => s + r.openPositions, 0);
   const totalFilled = requirements.reduce((s, r) => s + r.filledPositions, 0);
@@ -19,6 +22,14 @@ export const DashboardPage: React.FC = () => {
   const totalCFP = candidates.filter((c) => c.status === 'CFP Started').length;
 
   const isAM = currentUser?.role === 'ACCOUNT_MANAGER';
+
+  if (isLoading) {
+    return (
+      <div className="content">
+        <PageLoader message="Generating dashboard insights..." />
+      </div>
+    );
+  }
 
   if (isAM) {
     return (
@@ -57,7 +68,7 @@ export const DashboardPage: React.FC = () => {
                   {requirements.slice(0, 5).map(req => (
                     <tr key={req.id}>
                       <td style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--navy)', fontWeight: 600 }}>{req.requirementCode}</td>
-                      <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{req.requirementCode.split('-')[0]}</td>
+                      <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{req.requirementCode?.split('-')[0] || 'N/A'}</td>
                       <td>{req.techStack}</td>
                       <td style={{ fontWeight: 600, color: 'var(--navy)' }}>{req.openPositions}</td>
                       <td>{new Date(req.createdAt).toLocaleDateString()}</td>
@@ -169,7 +180,7 @@ export const DashboardPage: React.FC = () => {
               <div className="panel-body" style={{ padding: 10 }}>
                 {coes.slice(0, 5).map((coe, idx) => (
                   <div className="chart-bar-row" key={coe.id}>
-                    <span className="chart-bar-label" style={{ width: 64 }}>{coe.name.split(' ')[0]}</span>
+                    <span className="chart-bar-label" style={{ width: 64 }}>{coe.name?.split(' ')[0] || 'COE'}</span>
                     <div className="chart-bar-track">
                       <div className="chart-bar-fill" style={{ width: `${90 - (idx * 5)}%`, background: idx === 0 ? 'var(--green)' : idx < 3 ? 'var(--blue)' : 'var(--orange)' }}>
                         {90 - (idx * 5)}%

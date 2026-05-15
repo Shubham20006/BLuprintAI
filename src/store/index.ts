@@ -35,7 +35,10 @@ export const useSessionStore = create<SessionSlice>()(
       isAuthenticated: false,
       setCurrentUser: (user) =>
         set({ currentUser: user, isAuthenticated: !!user }),
-      logout: () => set({ currentUser: null, isAuthenticated: false }),
+      logout: () => {
+        localStorage.clear();
+        set({ currentUser: null, isAuthenticated: false });
+      },
     }),
     { name: 'mm-session' }
   )

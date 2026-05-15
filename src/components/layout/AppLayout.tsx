@@ -1,12 +1,23 @@
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { useUIStore } from '../../store';
+import { useIsFetching, useIsMutating } from '@tanstack/react-query';
+import { LinearProgress, Box, CircularProgress, Typography } from '@mui/material';
 
 export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { sidebarOpen } = useUIStore();
+  const isFetching = useIsFetching();
+  const isMutating = useIsMutating();
   
+  const showGlobalLoader = isFetching > 0;
+  const showMutationOverlay = isMutating > 0;
   return (
     <div className="shell">
+      {showGlobalLoader && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 99999, height: 2 }}>
+          <LinearProgress sx={{ height: 2 }} />
+        </div>
+      )}
       {sidebarOpen && <Sidebar />}
       <div className="main">
         {/* Global Header */}

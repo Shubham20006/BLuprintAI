@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Box, Chip, Avatar, Tooltip, LinearProgress,
+  Box, Chip, Avatar, Tooltip, LinearProgress, CircularProgress,
   Typography, alpha, useTheme,
 } from '@mui/material';
 import type { ChipProps } from '@mui/material';
@@ -210,3 +210,49 @@ export const SectionCard: React.FC<{
     </Box>
   );
 };
+// ─── Loading Button ──────────────────────────────────────────────────────────
+interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  loading?: boolean;
+  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'ghost';
+  icon?: React.ReactNode;
+}
+
+export const LoadingButton: React.FC<LoadingButtonProps> = ({ 
+  loading, 
+  variant = 'primary', 
+  icon, 
+  children, 
+  className = '', 
+  ...props 
+}) => {
+  return (
+    <button 
+      className={`btn btn-${variant} ${className} ${loading ? 'loading' : ''}`}
+      disabled={loading || props.disabled}
+      {...props}
+    >
+      {loading ? (
+        <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
+      ) : icon ? (
+        <span style={{ marginRight: 8, display: 'flex' }}>{icon}</span>
+      ) : null}
+      {children}
+    </button>
+  );
+};
+// ─── Page Loader ─────────────────────────────────────────────────────────────
+export const PageLoader: React.FC<{ message?: string }> = ({ message = 'Loading data...' }) => (
+  <Box sx={{ 
+    display: 'flex', 
+    flexDirection: 'column', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    py: 12,
+    gap: 2 
+  }}>
+    <CircularProgress size={40} sx={{ color: 'var(--blue)' }} />
+    <Typography sx={{ color: 'var(--g500)', fontSize: 14, fontWeight: 500 }}>
+      {message}
+    </Typography>
+  </Box>
+);

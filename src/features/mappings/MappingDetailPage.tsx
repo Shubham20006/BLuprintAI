@@ -204,7 +204,7 @@ export const MappingDetailPage: React.FC = () => {
               <i className="ti ti-robot" aria-hidden="true" /> AI Reasoning
             </div>
             <div style={{ fontSize: 12, color: 'var(--g500)', lineHeight: 1.5 }}>
-              {mappedCandidates[0]?.candidate?.name || 'The top candidate'} scores highest on {techShort} assessments ({mappedCandidates[0]?.techScore || 96}%) with strong proximity to {requirement.location}. Mix-and-match with {coeAllocations[1].name} ensures COE diversity and maintains fallback capacity.
+              {mappedCandidates[0]?.candidate?.name || 'The top candidate'} scores highest on {techShort} assessments ({mappedCandidates[0]?.techScore || 96}%) with strong proximity to {requirement.location}. Mix-and-match with {coeAllocations[1]?.name || 'partner COEs'} ensures COE diversity and maintains fallback capacity.
             </div>
           </div>
         </div>

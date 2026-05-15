@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 
-import { useUsers } from '../../api/hooks';
 import { useSessionStore } from '../../store';
-import type { User } from '../../types';
+import { LoadingButton } from '../../components/shared';
 
 interface GoogleUser {
   name: string;
@@ -17,7 +16,7 @@ interface GoogleUser {
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { setCurrentUser } = useSessionStore();
-  const { data: users = [], isLoading } = useUsers();
+  const [isLoggingIn, setIsLoggingIn] = React.useState(false);
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -25,6 +24,7 @@ export const LoginPage: React.FC = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoggingIn(true);
     setError('');
 
     try {
@@ -46,11 +46,37 @@ export const LoginPage: React.FC = () => {
     } catch (err) {
       console.error('Login error:', err);
       setError('Connection to server failed');
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    setError('Google login is temporarily disabled while we secure the backend. Please use email/password.');
+    setIsLoggingIn(true);
+    setError('');
+
+    try {
+      const response = await fetch('https://bluprint-ai.onrender.com/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        setCurrentUser(data.user);
+        navigate('/dashboard');
+      } else {
+        setError(data.message || 'Google login failed');
+      }
+    } catch (err) {
+      console.error('Google login error:', err);
+      setError('Connection to server failed');
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   return (
@@ -392,23 +418,18 @@ export const LoginPage: React.FC = () => {
                 </span>
               </div>
 
-              <button
+              <LoadingButton
                 type="submit"
-                className="btn btn-primary"
+                loading={isLoggingIn}
                 style={{
                   fontWeight: 600,
                   width: '100%',
                   justifyContent: 'center',
                   padding: 12,
                 }}
-                disabled={isLoading}
               >
-                <i
-                  className="ti ti-login"
-                  aria-hidden="true"
-                ></i>{' '}
                 Sign In
-              </button>
+              </LoadingButton>
             </form>
 
             <div

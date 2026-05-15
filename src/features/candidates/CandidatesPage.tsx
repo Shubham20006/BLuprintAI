@@ -14,6 +14,7 @@ import {
 import { useSessionStore } from '../../store';
 import { can } from '../../auth/permissions';
 import { generateId, exportToCSV } from '../../utils';
+import { PageLoader, LoadingButton } from '../../components/shared';
 
 import type { Candidate } from '../../types';
 
@@ -535,7 +536,10 @@ export const CandidatesPage: React.FC = () => {
           </div>
 
           <div style={{ padding: 0 }}>
-            <table className="tbl">
+            {isLoading ? (
+              <PageLoader message="Loading candidates..." />
+            ) : (
+              <table className="tbl">
               <thead>
                 <tr>
                   <th>Candidate</th>
@@ -600,19 +604,7 @@ export const CandidatesPage: React.FC = () => {
                               fontWeight: 600,
                             }}
                           >
-                            {c.name
-                              .split(' ')
-                              .map(
-                                (
-                                  w
-                                ) =>
-                                  w[0]
-                              )
-                              .join('')
-                              .slice(
-                                0,
-                                2
-                              )}
+                            {c.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '??'}
                           </div>
 
                           <div>
@@ -723,6 +715,7 @@ export const CandidatesPage: React.FC = () => {
                   )}
               </tbody>
             </table>
+            )}
           </div>
         </div>
       </div>
@@ -936,10 +929,9 @@ export const CandidatesPage: React.FC = () => {
                   Cancel
                 </button>
 
-                <button
+                <LoadingButton
                   type="submit"
-                  className="btn btn-primary"
-                  disabled={
+                  loading={
                     creating ||
                     updating
                   }
@@ -947,7 +939,7 @@ export const CandidatesPage: React.FC = () => {
                   {editing
                     ? 'Update Candidate'
                     : 'Add Candidate'}
-                </button>
+                </LoadingButton>
               </div>
             </form>
           </div>

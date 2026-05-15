@@ -7,6 +7,7 @@ import { useHiringDrives, useCOEs, useCreateHiringDrive } from '../../api/hooks'
 import { useSessionStore } from '../../store';
 import { can } from '../../auth/permissions';
 import { generateId } from '../../utils';
+import { PageLoader, LoadingButton } from '../../components/shared';
 
 const schema = z.object({
   coeId: z.string().min(1, 'Required'),
@@ -23,7 +24,7 @@ export const HiringDrivesPage: React.FC = () => {
   const { currentUser } = useSessionStore();
   const [open, setOpen] = React.useState(false);
 
-  const { data: drives = [] } = useHiringDrives();
+  const { data: drives = [], isLoading } = useHiringDrives();
   const { data: coes = [] } = useCOEs();
   const { mutateAsync: createDrive, isPending } = useCreateHiringDrive();
 
@@ -32,8 +33,8 @@ export const HiringDrivesPage: React.FC = () => {
     defaultValues: { coeId: '', driveName: '', date: '', venue: '', techCovered: '', notes: '' },
   });
 
-  const scopedDrives = currentUser && can.isCOEScoped(currentUser.role) && currentUser.coeScopeIds.length
-    ? drives.filter((d) => currentUser.coeScopeIds.some(id => String(id) === String(d.coeId)))
+  const scopedDrives = currentUser && can.isCOEScoped(currentUser.role) && Array.isArray(currentUser.coeScopeIds) && currentUser.coeScopeIds.length
+    ? drives.filter((d) => currentUser.coeScopeIds?.some(id => String(id) === String(d.coeId)))
     : drives;
 
   const onSubmit = async (data: FormValues) => {
@@ -80,48 +81,52 @@ export const HiringDrivesPage: React.FC = () => {
             </div>
           </div>
           <div style={{ padding: 0 }}>
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th>Drive Name</th>
-                  <th>COE</th>
-                  <th>Date</th>
-                  <th>Venue</th>
-                  <th>Tech Covered</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {scopedDrives.map((d) => {
-                  const coe = coes.find((c) => String(c.id) === String(d.coeId));
-                  return (
-                    <tr key={d.id}>
-                      <td>
-                        <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{d.driveName}</div>
-                      </td>
-                      <td>{coe?.name.split(' ').slice(0, 2).join(' ')}</td>
-                      <td>{new Date(d.date).toLocaleDateString()}</td>
-                      <td style={{ color: 'var(--g500)', fontSize: 13 }}>{d.venue}</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                          {d.techCovered.map((t) => (
-                            <span key={t} className="badge loi" style={{ fontSize: 12, padding: '2px 6px' }}>{t}</span>
-                          ))}
-                        </div>
-                      </td>
-                      <td><span className={`badge ${d.status === 'planned' ? 'active' : 'draft'}`}>{d.status}</span></td>
-                    </tr>
-                  );
-                })}
-                {scopedDrives.length === 0 && (
+            {isLoading ? (
+              <PageLoader message="Loading hiring drives..." />
+            ) : (
+              <table className="tbl">
+                <thead>
                   <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '40px 0', color: 'var(--g500)' }}>
-                      No drives found
-                    </td>
+                    <th>Drive Name</th>
+                    <th>COE</th>
+                    <th>Date</th>
+                    <th>Venue</th>
+                    <th>Tech Covered</th>
+                    <th>Status</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {scopedDrives.map((d) => {
+                    const coe = coes.find((c) => String(c.id) === String(d.coeId));
+                    return (
+                      <tr key={d.id}>
+                        <td>
+                          <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{d.driveName}</div>
+                        </td>
+                        <td>{coe?.name?.split(' ').slice(0, 2).join(' ') || 'N/A'}</td>
+                        <td>{new Date(d.date).toLocaleDateString()}</td>
+                        <td style={{ color: 'var(--g500)', fontSize: 13 }}>{d.venue}</td>
+                        <td>
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                            {(d.techCovered || []).map((t) => (
+                              <span key={t} className="badge loi" style={{ fontSize: 12, padding: '2px 6px' }}>{t}</span>
+                            ))}
+                          </div>
+                        </td>
+                        <td><span className={`badge ${d.status === 'planned' ? 'active' : 'draft'}`}>{d.status}</span></td>
+                      </tr>
+                    );
+                  })}
+                  {!isLoading && scopedDrives.length === 0 && (
+                    <tr>
+                      <td colSpan={6} style={{ textAlign: 'center', padding: '40px 0', color: 'var(--g500)' }}>
+                        No drives found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
@@ -190,9 +195,9 @@ export const HiringDrivesPage: React.FC = () => {
               </div>
               <div className="modal-ft">
                 <button type="button" className="btn btn-ghost" onClick={() => setOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={isPending}>
-                  {isPending ? 'Creating...' : 'Create Drive'}
-                </button>
+                <LoadingButton type="submit" loading={isPending}>
+                  Create Drive
+                </LoadingButton>
               </div>
             </form>
           </div>

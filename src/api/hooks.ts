@@ -8,7 +8,11 @@ import type {
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 export const useUsers = () =>
-  useQuery({ queryKey: ['users'], queryFn: () => api.get<User[]>('/users') });
+  useQuery({
+    queryKey: ['users'],
+    queryFn: () => api.get<User[]>('/users'),
+    enabled: !!localStorage.getItem('token'),
+  });
 
 export const useUser = (id: string) =>
   useQuery({ queryKey: ['users', id], queryFn: () => api.get<User>(`/users/${id}`), enabled: !!id });
@@ -271,6 +275,7 @@ export const useNotifications = (userId?: string) =>
   useQuery({
     queryKey: ['notifications', userId],
     queryFn: () => api.get<Notification[]>('/notifications', userId ? { userId } : undefined),
+    enabled: !!userId,
     refetchInterval: 30000,
   });
 

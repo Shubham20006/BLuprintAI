@@ -77,7 +77,7 @@ const AppRoutes: React.FC = () => {
 
       {/* MIS_MANAGER, ACCOUNT_MANAGER */}
       <Route path="/mandates" element={
-        <RoleGuard allowedRoles={['MIS_MANAGER', 'ACCOUNT_MANAGER']}>
+        <RoleGuard allowedRoles={['MIS_MANAGER', 'ACCOUNT_MANAGER', 'HEAD_OF_ENGINEERING']}>
           <MandatesPage />
         </RoleGuard>
       } />
@@ -89,7 +89,7 @@ const AppRoutes: React.FC = () => {
 
       {/* MIS_MANAGER, ACCOUNT_MANAGER, COE_LAB_HEAD */}
       <Route path="/requirements" element={
-        <RoleGuard allowedRoles={['MIS_MANAGER', 'ACCOUNT_MANAGER', 'COE_LAB_HEAD']}>
+        <RoleGuard allowedRoles={['MIS_MANAGER', 'ACCOUNT_MANAGER', 'COE_LAB_HEAD', 'HEAD_OF_ENGINEERING']}>
           <RequirementsPage />
         </RoleGuard>
       } />

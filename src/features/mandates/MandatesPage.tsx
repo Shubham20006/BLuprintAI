@@ -4,10 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
-import { useMandates, useClients, useCreateMandate, useUpdateMandate } from '../../api/hooks';
+import { useMandates, useClients, useCreateMandate, useUpdateMandate, useRequirements } from '../../api/hooks';
 import { useSessionStore } from '../../store';
 import { can } from '../../auth/permissions';
 import { formatDate, generateId } from '../../utils';
+import { PageLoader, LoadingButton } from '../../components/shared';
 import type { Mandate } from '../../types';
 
 const schema = z.object({
@@ -31,6 +32,7 @@ export const MandatesPage: React.FC = () => {
   const [search, setSearch] = React.useState('');
 
   const { data: mandates = [], isLoading } = useMandates();
+  const { data: requirements = [] } = useRequirements();
   const { data: clients = [] } = useClients();
   const { mutateAsync: createMandate, isPending: creating } = useCreateMandate();
   const { mutateAsync: updateMandate, isPending: updating } = useUpdateMandate();
@@ -97,7 +99,7 @@ export const MandatesPage: React.FC = () => {
         </div>
         <div className="topbar-right">
           {canCreate && (
-            <button className="btn btn-primary" onClick={() => handleOpen()}>
+            <button className="btn btn-primary" onClick={() => navigate('/requirements')}>
               <i className="ti ti-plus" /> New Mandate
             </button>
           )}
@@ -126,20 +128,23 @@ export const MandatesPage: React.FC = () => {
             <span className="panel-title">{mandates.length} Total Mandates</span>
           </div>
           <div className="panel-body" style={{ padding: 0 }}>
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th>Mandate Name</th>
-                  <th>Client</th>
-                  <th>Type</th>
-                  <th>Locations</th>
-                  <th>Onboarding</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((m) => {
+            {isLoading ? (
+              <PageLoader message="Loading mandates..." />
+            ) : (
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th>Mandate Name</th>
+                    <th>Client</th>
+                    <th>Type</th>
+                    <th>Locations</th>
+                    <th>Onboarding</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((m) => {
                   const client = clients.find((c) => c.id === m.clientId);
                   return (
                     <tr key={m.id}>
@@ -160,11 +165,33 @@ export const MandatesPage: React.FC = () => {
                       <td><span className={`badge ${m.status.toLowerCase()}`}>{m.status}</span></td>
                       <td style={{ textAlign: 'right' }}>
                         <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                          <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/mandates/${m.id}`)}>
+                          <button 
+                            className="btn btn-ghost btn-sm" 
+                            title="View details"
+                            onClick={() => {
+                              const req = requirements.find(r => r.mandateId === m.id);
+                              if (req) {
+                                navigate('/requirements', { state: { requirement: req, mode: 'view' } });
+                              } else {
+                                enqueueSnackbar('No requirement details found', { variant: 'info' });
+                              }
+                            }}
+                          >
                             <i className="ti ti-eye" />
                           </button>
                           {canCreate && (
-                            <button className="btn btn-ghost btn-sm" onClick={() => handleOpen(m)}>
+                            <button 
+                              className="btn btn-ghost btn-sm" 
+                              title="Edit mandate"
+                              onClick={() => {
+                                const req = requirements.find(r => r.mandateId === m.id);
+                                if (req) {
+                                  navigate('/requirements', { state: { requirement: req, mode: 'edit' } });
+                                } else {
+                                  enqueueSnackbar('No requirement details found for editing', { variant: 'info' });
+                                }
+                              }}
+                            >
                               <i className="ti ti-edit" />
                             </button>
                           )}
@@ -182,9 +209,10 @@ export const MandatesPage: React.FC = () => {
                 )}
               </tbody>
             </table>
-          </div>
+          )}
         </div>
       </div>
+    </div>
 
       {open && (
         <div className="modal visible" style={{ zIndex: 1300 }}>
@@ -246,9 +274,9 @@ export const MandatesPage: React.FC = () => {
               </div>
               <div className="modal-ft">
                 <button type="button" className="btn btn-ghost" onClick={() => setOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={creating || updating}>
+                <LoadingButton type="submit" loading={creating || updating}>
                   {editing ? 'Update' : 'Create'} Mandate
-                </button>
+                </LoadingButton>
               </div>
             </form>
           </div>

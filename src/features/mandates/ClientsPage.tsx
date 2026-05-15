@@ -1,5 +1,6 @@
 import React from 'react';
 import { useClients } from '../../api/hooks';
+import { PageLoader } from '../../components/shared';
 
 export const ClientsPage: React.FC = () => {
   const [search, setSearch] =
@@ -105,15 +106,18 @@ export const ClientsPage: React.FC = () => {
               padding: 0,
             }}
           >
-            <table
-              className="tbl"
-              style={{
-                width: '100%',
-                borderCollapse:
-                  'separate',
-                borderSpacing: 0,
-              }}
-            >
+            {isLoading ? (
+              <PageLoader message="Loading clients..." />
+            ) : (
+              <table
+                className="tbl"
+                style={{
+                  width: '100%',
+                  borderCollapse:
+                    'separate',
+                  borderSpacing: 0,
+                }}
+              >
               <thead>
                 <tr>
                   <th
@@ -206,6 +210,7 @@ export const ClientsPage: React.FC = () => {
                   )}
               </tbody>
             </table>
+            )}
           </div>
         </div>
       </div>

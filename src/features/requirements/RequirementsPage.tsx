@@ -34,6 +34,7 @@ import {
   generateId,
   generateRequirementId,
 } from '../../utils';
+import { LoadingButton } from '../../components/shared';
 
 const schema = z.object({
   companyName: z.string().min(1, 'Required'),
@@ -897,16 +898,15 @@ export const RequirementsPage: React.FC = () => {
                 </button>
 
                 {!isView && (
-                  <button
+                  <LoadingButton
                     type="submit"
                     form="req-form"
-                    className="btn btn-primary"
-                    disabled={isPending}
+                    loading={isPending}
                   >
                     {isEdit
                       ? 'Update Mandate'
                       : 'Create Mandate'}
-                  </button>
+                  </LoadingButton>
                 )}
               </div>
             </div>

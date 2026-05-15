@@ -10,6 +10,7 @@ import {
 import { useSessionStore } from '../../store';
 import { can } from '../../auth/permissions';
 import { formatDate, generateId } from '../../utils';
+import { PageLoader, LoadingButton } from '../../components/shared';
 import type { Mapping, MappingStatus } from '../../types';
 
 const MAPPING_STEPS: MappingStatus[] = [
@@ -27,27 +28,29 @@ export const MappingsPage: React.FC = () => {
   const [selectedCandidateIds, setSelectedCandidateIds] = React.useState<string[]>([]);
   const [notes, setNotes] = React.useState('');
 
-  const { data: mappings = [] } = useMappings();
-  const { data: requirements = [] } = useRequirements();
-  const { data: candidates = [] } = useCandidates();
+  const { data: mappings = [], isLoading: loadingMappings } = useMappings();
+  const { data: requirements = [], isLoading: loadingReqs } = useRequirements();
+  const { data: candidates = [], isLoading: loadingCands } = useCandidates();
   const { data: coes = [] } = useCOEs();
-  const { mutateAsync: createMapping } = useCreateMapping();
-  const { mutateAsync: updateMapping } = useUpdateMapping();
+  const { mutateAsync: createMapping, isPending: creating } = useCreateMapping();
+  const { mutateAsync: updateMapping, isPending: updating } = useUpdateMapping();
   const { mutateAsync: createLineItem } = useCreateMappingLineItem();
   const { mutateAsync: updateCandidate } = useUpdateCandidate();
+
+  const isLoading = loadingMappings || loadingReqs || loadingCands;
 
   const requirement = requirements.find((r) => r.id === selectedReqId);
   const remainingCap = requirement ? requirement.openPositions - requirement.filledPositions : 0;
 
   const filteredCandidates = candidates.filter((c) =>
     !currentUser || !can.isCOEScoped(currentUser.role) ||
-    currentUser.coeScopeIds.some(id => String(id) === String(c.coeId))
+    (Array.isArray(currentUser.coeScopeIds) && currentUser.coeScopeIds.some(id => String(id) === String(c.coeId)))
   );
 
   const filtered = mappings.filter((m) => {
     const req = requirements.find((r) => r.id === m.requirementId);
-    return req?.requirementCode.toLowerCase().includes(search.toLowerCase()) ||
-      m.status.toLowerCase().includes(search.toLowerCase());
+    return req?.requirementCode?.toLowerCase().includes(search.toLowerCase()) ||
+      m.status?.toLowerCase().includes(search.toLowerCase());
   });
 
   const handleSubmitMapping = async () => {
@@ -162,61 +165,65 @@ export const MappingsPage: React.FC = () => {
             </div>
 
             <div style={{ overflowX: 'auto' }}>
-              <table className="tbl">
-                <thead>
-                  <tr>
-                    <th>Requirement</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Updated</th>
-                    <th>Notes</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((m) => {
-                    const req = requirements.find((r) => r.id === m.requirementId);
-                    return (
-                      <tr key={m.id}>
-                        <td>
-                          <div style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>
-                            {req?.requirementCode || m.requirementId}
-                          </div>
-                        </td>
-                        <td>
-                          <span className={`badge ${m.status === 'Draft' ? 'draft' : 'active'}`}>{m.status}</span>
-                        </td>
-                        <td style={{ fontSize: 13, color: 'var(--g600)' }}>{formatDate(m.createdAt)}</td>
-                        <td style={{ fontSize: 13, color: 'var(--g600)' }}>{formatDate(m.updatedAt)}</td>
-                        <td style={{ fontSize: 13, color: 'var(--g500)', maxWidth: 160, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {m.notes || '—'}
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/mappings/${m.id}`)}>
-                            <i className="ti ti-eye" aria-hidden="true" />
-                          </button>
-                          {currentUser && (
-                            (m.status === 'Draft' && can.submitMapping(currentUser.role)) ||
-                            (m.status === 'Engineering Review' && can.engineeringApprove(currentUser.role)) ||
-                            (m.status === 'Approved by Eng' && can.misConfirm(currentUser.role))
-                          ) && (
-                            <button className="btn btn-ghost btn-sm" style={{ color: 'var(--blue)' }} onClick={() => handleAdvanceStatus(m)} title="Advance Status">
-                              <i className="ti ti-arrow-right" aria-hidden="true" />
+              {isLoading ? (
+                <PageLoader message="Loading mappings..." />
+              ) : (
+                <table className="tbl">
+                  <thead>
+                    <tr>
+                      <th>Requirement</th>
+                      <th>Status</th>
+                      <th>Created</th>
+                      <th>Updated</th>
+                      <th>Notes</th>
+                      <th style={{ textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((m) => {
+                      const req = requirements.find((r) => r.id === m.requirementId);
+                      return (
+                        <tr key={m.id}>
+                          <td>
+                            <div style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>
+                              {req?.requirementCode || m.requirementId}
+                            </div>
+                          </td>
+                          <td>
+                            <span className={`badge ${m.status === 'Draft' ? 'draft' : 'active'}`}>{m.status}</span>
+                          </td>
+                          <td style={{ fontSize: 13, color: 'var(--g600)' }}>{formatDate(m.createdAt)}</td>
+                          <td style={{ fontSize: 13, color: 'var(--g600)' }}>{formatDate(m.updatedAt)}</td>
+                          <td style={{ fontSize: 13, color: 'var(--g500)', maxWidth: 160, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {m.notes || '—'}
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/mappings/${m.id}`)}>
+                              <i className="ti ti-eye" aria-hidden="true" />
                             </button>
-                          )}
+                            {currentUser && (
+                              (m.status === 'Draft' && can.submitMapping(currentUser.role)) ||
+                              (m.status === 'Engineering Review' && can.engineeringApprove(currentUser.role)) ||
+                              (m.status === 'Approved by Eng' && can.misConfirm(currentUser.role))
+                            ) && (
+                              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--blue)' }} onClick={() => handleAdvanceStatus(m)} title="Advance Status">
+                                <i className="ti ti-arrow-right" aria-hidden="true" />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {!isLoading && filtered.length === 0 && (
+                      <tr>
+                        <td colSpan={6} style={{ textAlign: 'center', padding: 30, color: 'var(--g500)' }}>
+                          No mappings found
                         </td>
                       </tr>
-                    );
-                  })}
-                  {filtered.length === 0 && (
-                    <tr>
-                      <td colSpan={6} style={{ textAlign: 'center', padding: 30, color: 'var(--g500)' }}>
-                        No mappings found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
@@ -291,7 +298,7 @@ export const MappingsPage: React.FC = () => {
                               {c.name}
                               {c.status === 'Mapped' && <div style={{ fontSize: 10, color: 'var(--red)', fontWeight: 700 }}>CONFLICT</div>}
                             </td>
-                            <td style={{ fontSize: 13, fontWeight: 500, color: 'var(--navy)' }}>{coe?.name.split(' ')[0]}</td>
+                            <td style={{ fontSize: 13, fontWeight: 500, color: 'var(--navy)' }}>{coe?.name?.split(' ')[0] || 'N/A'}</td>
                             <td style={{ fontSize: 13, color: dateMisaligned ? 'var(--red)' : 'var(--navy)', fontWeight: dateMisaligned ? 700 : 500 }}>
                               {c.availabilityDate}
                               {dateMisaligned && <i className="ti ti-alert-triangle" style={{ marginLeft: 4 }} title="After onboarding date" />}
@@ -312,7 +319,9 @@ export const MappingsPage: React.FC = () => {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setNewOpen(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={handleSubmitMapping}>Create Draft Mapping</button>
+              <LoadingButton loading={creating} onClick={handleSubmitMapping}>
+                Create Draft Mapping
+              </LoadingButton>
             </div>
           </div>
         </div>
