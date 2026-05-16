@@ -36,7 +36,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Mandates', path: '/mandates', icon: 'ti-briefcase', roles: ['MIS_MANAGER'] },
   { label: 'Mappings', path: '/mappings', icon: 'ti-topology-complex', roles: ['MIS_MANAGER'] },
   { label: 'LOI Reports', path: '/loi', icon: 'ti-file-certificate', roles: ['MIS_MANAGER'] },
-  { label: 'COE Performance', path: '/dashboard', icon: 'ti-certificate', roles: ['MIS_MANAGER'] },
+  // { label: 'COE Performance', path: '/dashboard', icon: 'ti-certificate', roles: ['MIS_MANAGER'] },
   { label: 'Admin', path: '/admin/users', icon: 'ti-settings', roles: ['MIS_MANAGER'] }, // Keep Admin as it is usually needed for MIS
 
   // Head of Engineering
@@ -66,6 +66,13 @@ export const Sidebar: React.FC = () => {
 
   const isActive = (path: string) => {
     if (path === '/dashboard' && location.pathname === '/dashboard') return true;
+    if (
+      path === '/mandates' &&
+      (location.pathname.startsWith('/mandates') ||
+        location.pathname.startsWith('/requirements'))
+    ) {
+      return true;
+    }
     if (path !== '/dashboard' && location.pathname.startsWith(path)) return true;
     return false;
   };
@@ -128,11 +135,11 @@ export const Sidebar: React.FC = () => {
           <div className="modal-content" style={{ maxWidth: 450, borderRadius: 16, overflow: 'hidden' }}>
             <div className="modal-body" style={{ padding: '24px 24px 16px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 28 }}>
-                <div style={{ 
-                  width: 80, 
-                  height: 80, 
-                  borderRadius: '50%', 
-                  background: 'linear-gradient(135deg, var(--blue), var(--navy))', 
+                <div style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, var(--blue), var(--navy))',
                   color: '#fff',
                   display: 'flex',
                   alignItems: 'center',
@@ -151,7 +158,7 @@ export const Sidebar: React.FC = () => {
                 <div style={{ fontSize: 14, color: '#64748B', marginTop: 2, fontWeight: 500 }}>
                   {currentUser?.email}
                 </div>
-                <div style={{ 
+                <div style={{
                   marginTop: 12,
                   padding: '4px 14px',
                   borderRadius: 100,
@@ -167,8 +174,8 @@ export const Sidebar: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ 
-                borderRadius: 20, 
+              <div style={{
+                borderRadius: 20,
                 padding: '20px',
                 background: '#F8FAFC',
                 border: '1px solid #F1F5F9',
@@ -184,42 +191,42 @@ export const Sidebar: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ 
-              padding: '0 24px 24px', 
-              display: 'flex', 
-              gap: 12 
+            <div style={{
+              padding: '0 24px 24px',
+              display: 'flex',
+              gap: 12
             }}>
-              <button 
-                style={{ 
-                  flex: 1, 
-                  height: 48, 
-                  borderRadius: 12, 
-                  border: '1px solid #E2E8F0', 
-                  background: '#fff', 
+              <button
+                style={{
+                  flex: 1,
+                  height: 48,
+                  borderRadius: 12,
+                  border: '1px solid #E2E8F0',
+                  background: '#fff',
                   color: '#475569',
                   fontWeight: 700,
                   fontSize: 14,
                   cursor: 'pointer',
                   transition: 'all 0.2s'
-                }} 
+                }}
                 onClick={() => setShowLogoutConfirm(false)}
               >
                 Cancel
               </button>
-              <button 
-                style={{ 
-                  flex: 1, 
-                  height: 48, 
-                  borderRadius: 12, 
-                  border: 'none', 
-                  background: '#E11D48', 
+              <button
+                style={{
+                  flex: 1,
+                  height: 48,
+                  borderRadius: 12,
+                  border: 'none',
+                  background: '#E11D48',
                   color: '#fff',
                   fontWeight: 700,
                   fontSize: 14,
                   cursor: 'pointer',
                   boxShadow: '0 4px 12px rgba(225,29,72,0.25)',
                   transition: 'all 0.2s'
-                }} 
+                }}
                 onClick={handleLogout}
               >
                 Sign Out
