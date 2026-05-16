@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSessionStore } from '../../store';
 import type { UserRole } from '../../types';
+import { Box, Typography, Avatar, Dialog, DialogContent, DialogActions, Button, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 
 interface NavItem {
   label: string;
@@ -26,10 +27,9 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'LOI Status', path: '/loi', icon: 'ti-file-certificate', roles: ['COE_COORDINATOR'] },
 
   // Account Manager
-  { label: 'Analytics', path: '/dashboard', icon: 'ti-chart-bar', roles: ['ACCOUNT_MANAGER'] },
+  { label: 'Dashboard', path: '/dashboard', icon: 'ti-layout-dashboard', roles: ['ACCOUNT_MANAGER'] },
   { label: 'Mandates', path: '/mandates', icon: 'ti-briefcase', roles: ['ACCOUNT_MANAGER'] },
   { label: 'Clients', path: '/clients', icon: 'ti-building', roles: ['ACCOUNT_MANAGER'] },
-  { label: 'LOI Tracker', path: '/loi', icon: 'ti-file-certificate', roles: ['ACCOUNT_MANAGER'] },
 
   // MIS Manager (Analytics, Mandates, Mappings, LOI Reports, COE Performance)
   { label: 'Analytics', path: '/dashboard', icon: 'ti-chart-bar', roles: ['MIS_MANAGER'] },
@@ -85,149 +85,149 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="sidebar">
-      <div className="sb-logo">
-        <div className="sb-logo-name">BLueprint</div>
-        <div className="sb-logo-sub">Fellowship MIS</div>
-      </div>
+    <Box sx={{ width: 180, bgcolor: 'secondary.main', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: '16px 14px 12px', borderBottom: '1px solid rgba(255,255,255,.1)' }}>
+        <Typography variant="h6" sx={{ fontSize: 19, fontWeight: 700, color: '#fff', letterSpacing: '-0.3px', lineHeight: 1.2 }}>BLueprint</Typography>
+        <Typography sx={{ fontSize: 12, color: '#7CA8D4', mt: '1px' }}>Fellowship MIS</Typography>
+      </Box>
       {currentUser && (
-        <div className="sb-role">{formatRoleLabel(currentUser.role)}</div>
+        <Typography sx={{ m: '8px 10px 4px', fontSize: 11, fontWeight: 600, color: '#4A6FA5', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+          {formatRoleLabel(currentUser.role)}
+        </Typography>
       )}
 
-      <div style={{ flex: 1, overflowY: 'auto', marginTop: 4 }}>
-        {NAV_ITEMS.filter(isItemVisible)?.map((item) => (
-          <div
-            key={item.label + item.path}
-            className={`sb-item ${isActive(item.path) ? 'active' : ''}`}
-            onClick={() => navigate(item.path)}
+      <Box sx={{ flex: 1, overflowY: 'auto', mt: 0.5 }}>
+        <List disablePadding>
+          {NAV_ITEMS.filter(isItemVisible)?.map((item) => (
+            <ListItemButton
+              key={item.label + item.path}
+              selected={isActive(item.path)}
+              onClick={() => navigate(item.path)}
+              sx={{ py: 1, px: 1.75 }}
+            >
+              <ListItemIcon sx={{ minWidth: 24, color: 'inherit' }}>
+                <i className={`ti ${item.icon}`} style={{ fontSize: 17 }} />
+              </ListItemIcon>
+              <ListItemText 
+                primary={item.label} 
+                primaryTypographyProps={{ fontSize: 14, fontWeight: isActive(item.path) ? 600 : 400 }} 
+              />
+            </ListItemButton>
+          ))}
+        </List>
+      </Box>
+
+      {currentUser && (
+        <Box sx={{ mt: 'auto', borderTop: '1px solid rgba(255,255,255,.1)', p: '10px 14px' }}>
+          <Box 
+            onClick={() => setShowLogoutConfirm(true)} 
+            sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', '&:hover': { opacity: 0.8 } }}
+            title="Click to logout"
           >
-            <i className={`ti ${item.icon}`} />
-            {item.label}
-          </div>
-        ))}
-      </div>
-
-      {currentUser && (
-        <div className="sb-bottom">
-          <div className="sb-user" onClick={() => setShowLogoutConfirm(true)} style={{ cursor: 'pointer' }} title="Click to logout">
-            <div className="sb-avatar" style={{ background: 'var(--blue)', color: '#fff', fontWeight: 700 }}>
+            <Avatar sx={{ width: 28, height: 28, bgcolor: 'primary.main', color: '#fff', fontSize: 13, fontWeight: 600 }}>
               {getInitials(currentUser.name)}
-            </div>
-            <div>
-              <div className="sb-uname">{currentUser.name}</div>
-              <div className="sb-urole" style={{ fontSize: 10, opacity: 0.7 }}>
-                {currentUser.role?.split('_')[0]}
-              </div>
-            </div>
-          </div>
-        </div>
+            </Avatar>
+            <Box>
+              <Typography sx={{ fontSize: 13, color: '#A8C8E8', fontWeight: 500, lineHeight: 1.2 }}>{currentUser.name}</Typography>
+              <Typography sx={{ fontSize: 10, color: '#4A6FA5', opacity: 0.7 }}>{currentUser.role?.split('_')[0]}</Typography>
+            </Box>
+          </Box>
+        </Box>
       )}
 
-      {showLogoutConfirm && (
-        <div className="modal-overlay" style={{ zIndex: 9999 }}>
-          <div className="modal-content" style={{ maxWidth: 450, borderRadius: 16, overflow: 'hidden' }}>
-            <div className="modal-body" style={{ padding: '24px 24px 16px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 28 }}>
-                <div style={{ 
-                  width: 80, 
-                  height: 80, 
-                  borderRadius: '50%', 
-                  background: 'linear-gradient(135deg, var(--blue), var(--navy))', 
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 32,
-                  fontWeight: 800,
-                  marginBottom: 16,
-                  boxShadow: '0 10px 20px rgba(10,132,208,0.25)',
-                  border: '4px solid #fff'
-                }}>
-                  {getInitials(currentUser?.name)}
-                </div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: '#1E293B', letterSpacing: '-0.5px' }}>
-                  {currentUser?.name}
-                </div>
-                <div style={{ fontSize: 14, color: '#64748B', marginTop: 2, fontWeight: 500 }}>
-                  {currentUser?.email}
-                </div>
-                <div style={{ 
-                  marginTop: 12,
-                  padding: '4px 14px',
-                  borderRadius: 100,
-                  background: '#F1F5F9',
-                  color: '#475569',
-                  fontSize: 10,
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                  border: '1px solid #E2E8F0'
-                }}>
-                  {currentUser?.role?.replace(/_/g, ' ')}
-                </div>
-              </div>
-
-              <div style={{ 
-                borderRadius: 20, 
-                padding: '20px',
-                background: '#F8FAFC',
-                border: '1px solid #F1F5F9',
-                marginBottom: 28,
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', marginBottom: 6 }}>
-                  End current session?
-                </div>
-                <div style={{ fontSize: 14, color: '#64748B', lineHeight: 1.6 }}>
-                  You will be signed out from this device and your local cache will be cleared.
-                </div>
-              </div>
-            </div>
-
-            <div style={{ 
-              padding: '0 24px 24px', 
-              display: 'flex', 
-              gap: 12 
+      <Dialog open={showLogoutConfirm} onClose={() => setShowLogoutConfirm(false)} PaperProps={{ sx: { maxWidth: 450, borderRadius: 4, overflow: 'hidden' } }}>
+        <DialogContent sx={{ p: '24px 24px 16px' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', mb: 3.5 }}>
+            <Avatar 
+              sx={{ 
+                width: 80, 
+                height: 80, 
+                background: 'linear-gradient(135deg, var(--blue), var(--navy))', 
+                color: '#fff',
+                fontSize: 32,
+                fontWeight: 800,
+                mb: 2,
+                boxShadow: '0 10px 20px rgba(10,132,208,0.25)',
+                border: '4px solid #fff'
+              }}
+            >
+              {getInitials(currentUser?.name)}
+            </Avatar>
+            <Typography sx={{ fontSize: 22, fontWeight: 800, color: '#1E293B', letterSpacing: '-0.5px' }}>
+              {currentUser?.name}
+            </Typography>
+            <Typography sx={{ fontSize: 14, color: '#64748B', mt: 0.5, fontWeight: 500 }}>
+              {currentUser?.email}
+            </Typography>
+            <Box sx={{ 
+              mt: 1.5,
+              px: 1.75,
+              py: 0.5,
+              borderRadius: 100,
+              bgcolor: '#F1F5F9',
+              color: '#475569',
+              fontSize: 10,
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              border: '1px solid #E2E8F0'
             }}>
-              <button 
-                style={{ 
-                  flex: 1, 
-                  height: 48, 
-                  borderRadius: 12, 
-                  border: '1px solid #E2E8F0', 
-                  background: '#fff', 
-                  color: '#475569',
-                  fontWeight: 700,
-                  fontSize: 14,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }} 
-                onClick={() => setShowLogoutConfirm(false)}
-              >
-                Cancel
-              </button>
-              <button 
-                style={{ 
-                  flex: 1, 
-                  height: 48, 
-                  borderRadius: 12, 
-                  border: 'none', 
-                  background: '#E11D48', 
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: 14,
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(225,29,72,0.25)',
-                  transition: 'all 0.2s'
-                }} 
-                onClick={handleLogout}
-              >
-                Sign Out
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+              {currentUser?.role?.replace(/_/g, ' ')}
+            </Box>
+          </Box>
+
+          <Box sx={{ 
+            borderRadius: 5, 
+            p: 2.5,
+            bgcolor: '#F8FAFC',
+            border: '1px solid #F1F5F9',
+            mb: 1,
+            textAlign: 'center'
+          }}>
+            <Typography sx={{ fontSize: 16, fontWeight: 700, color: '#0F172A', mb: 0.75 }}>
+              End current session?
+            </Typography>
+            <Typography sx={{ fontSize: 14, color: '#64748B', lineHeight: 1.6 }}>
+              You will be signed out from this device and your local cache will be cleared.
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: '0 24px 24px', gap: 1.5, '& > :not(style) ~ :not(style)': { ml: 0 } }}>
+          <Button 
+            variant="outlined" 
+            fullWidth 
+            onClick={() => setShowLogoutConfirm(false)}
+            sx={{ 
+              height: 48, 
+              borderRadius: 3, 
+              borderColor: '#E2E8F0', 
+              color: '#475569',
+              fontWeight: 700,
+              fontSize: 14,
+              '&:hover': { borderColor: '#CBD5E1', bgcolor: '#F8FAFC' }
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            variant="contained" 
+            fullWidth 
+            onClick={handleLogout}
+            sx={{ 
+              height: 48, 
+              borderRadius: 3, 
+              bgcolor: '#E11D48', 
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: 14,
+              boxShadow: '0 4px 12px rgba(225,29,72,0.25)',
+              '&:hover': { bgcolor: '#BE123C', boxShadow: '0 6px 16px rgba(225,29,72,0.35)' }
+            }}
+          >
+            Sign Out
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };

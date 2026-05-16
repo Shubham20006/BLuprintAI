@@ -1,9 +1,35 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  Grid,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  InputAdornment,
+  LinearProgress,
+  FormControl,
+  InputLabel,
+  FormHelperText
+} from '@mui/material';
 import { useMandates, useClients, useCreateMandate, useUpdateMandate, useRequirements } from '../../api/hooks';
 import { useSessionStore } from '../../store';
 import { can } from '../../auth/permissions';
@@ -93,195 +119,197 @@ export const MandatesPage: React.FC = () => {
 
   return (
     <>
-      <div className="topbar">
-        <div className="topbar-left">
-          <span className="breadcrumb">Hiring Management / <span>Mandates</span></span>
-        </div>
-        <div className="topbar-right">
+      <Box sx={{ bgcolor: '#fff', borderBottom: '1px solid #E5EBF0', px: 2, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+          <Typography sx={{ fontSize: 15, color: '#6B7C93' }}>
+            Hiring Management / <Box component="span" sx={{ color: '#111827', fontWeight: 500 }}>Mandates</Box>
+          </Typography>
+        </Box>
+        <Box>
           {canCreate && (
-            <button className="btn btn-primary" onClick={() => navigate('/requirements')}>
-              <i className="ti ti-plus" /> New Mandate
-            </button>
+            <Button variant="contained" color="primary" onClick={() => navigate('/requirements')}>
+              <i className="ti ti-plus" style={{ marginRight: 6 }} /> New Mandate
+            </Button>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      <div className="content">
-        <div className="panel" style={{ marginBottom: 20 }}>
-          <div className="panel-hd" style={{ background: 'var(--g50)', borderBottom: '1px solid var(--g200)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 12 }}>
-              <i className="ti ti-search" style={{ color: 'var(--g400)' }} />
-              <input 
-                type="text" 
-                className="form-input" 
-                placeholder="Search mandates by name or client..." 
-                style={{ border: 'none', background: 'transparent', padding: 0 }}
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
+      <Box sx={{ p: 3 }}>
+        <Card sx={{ mb: 3, borderRadius: 2 }}>
+          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <TextField
+              size="small"
+              placeholder="Search mandates by name or client..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              sx={{ width: 400 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <i className="ti ti-search" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+        </Card>
 
-        <div className="panel">
-          <div className="panel-hd">
-            <span className="panel-title">{mandates.length} Total Mandates</span>
-          </div>
-          <div className="panel-body" style={{ padding: 0 }}>
+        <Card sx={{ borderRadius: 2 }}>
+          <Box sx={{ p: '16px 20px', borderBottom: '1px solid #E5EBF0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography sx={{ fontSize: 16, fontWeight: 600 }}>{mandates.length} Total Mandates</Typography>
+          </Box>
+          <Box sx={{ width: '100%', overflowX: 'auto' }}>
             {isLoading ? (
-              <PageLoader message="Loading mandates..." />
+              <Box sx={{ p: 4 }}><LinearProgress /></Box>
             ) : (
-              <table className="tbl">
-                <thead>
-                  <tr>
-                    <th>Mandate Name</th>
-                    <th>Client</th>
-                    <th>Type</th>
-                    <th>Locations</th>
-                    <th>Onboarding</th>
-                    <th>Status</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Mandate Name</TableCell>
+                    <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Client</TableCell>
+                    <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Type</TableCell>
+                    <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Locations</TableCell>
+                    <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Onboarding</TableCell>
+                    <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Status</TableCell>
+                    <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }} align="right">Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
                   {filtered.map((m) => {
-                  const client = clients.find((c) => c.id === m.clientId);
-                  return (
-                    <tr key={m.id}>
-                      <td>
-                        <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{m.companyName}</div>
-                        <div style={{ fontSize: 11, color: 'var(--g500)' }}>{m.contractRef}</div>
-                      </td>
-                      <td>{client?.name || m.clientId}</td>
-                      <td><span className="badge draft">{m.mandateType}</span></td>
-                      <td>
-                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                          {m.locations.map((l) => (
-                            <span key={l} className="badge draft" style={{ fontSize: 10 }}>{l}</span>
-                          ))}
-                        </div>
-                      </td>
-                      <td>{formatDate(m.onboardingDate)}</td>
-                      <td><span className={`badge ${m.status.toLowerCase()}`}>{m.status}</span></td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                          <button 
-                            className="btn btn-ghost btn-sm" 
-                            title="View details"
-                            onClick={() => {
-                              const req = requirements.find(r => r.mandateId === m.id);
-                              if (req) {
-                                navigate('/requirements', { state: { requirement: req, mode: 'view' } });
-                              } else {
-                                enqueueSnackbar('No requirement details found', { variant: 'info' });
-                              }
-                            }}
-                          >
-                            <i className="ti ti-eye" />
-                          </button>
-                          {canCreate && (
-                            <button 
-                              className="btn btn-ghost btn-sm" 
-                              title="Edit mandate"
+                    const client = clients.find((c) => c.id === m.clientId);
+                    return (
+                      <TableRow key={m.id} hover>
+                        <TableCell>
+                          <Typography sx={{ fontWeight: 600, color: '#111827', fontSize: 14 }}>{m.companyName}</Typography>
+                          <Typography sx={{ fontSize: 12, color: '#6B7C93' }}>{m.contractRef}</Typography>
+                        </TableCell>
+                        <TableCell sx={{ fontSize: 14 }}>{client?.name || m.clientId}</TableCell>
+                        <TableCell><Chip label={m.mandateType} size="small" sx={{ bgcolor: '#F1F5F9', color: '#475569', fontWeight: 600, borderRadius: 1 }} /></TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                            {m.locations.map((l) => (
+                              <Chip key={l} label={l} size="small" sx={{ bgcolor: '#F1F5F9', color: '#475569', fontWeight: 600, borderRadius: 1, fontSize: 11 }} />
+                            ))}
+                          </Box>
+                        </TableCell>
+                        <TableCell sx={{ fontSize: 14 }}>{formatDate(m.onboardingDate)}</TableCell>
+                        <TableCell>
+                          <Chip 
+                            label={m.status} 
+                            size="small" 
+                            sx={{ 
+                              bgcolor: m.status === 'active' ? '#DCFCE7' : m.status === 'closed' ? '#FEE2E2' : '#FEF9C3', 
+                              color: m.status === 'active' ? '#166534' : m.status === 'closed' ? '#991B1B' : '#854D0E', 
+                              fontWeight: 600, 
+                              textTransform: 'capitalize', 
+                              borderRadius: 1 
+                            }} 
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                            <IconButton 
+                              size="small" 
                               onClick={() => {
                                 const req = requirements.find(r => r.mandateId === m.id);
                                 if (req) {
-                                  navigate('/requirements', { state: { requirement: req, mode: 'edit' } });
+                                  navigate('/requirements', { state: { requirement: req, mode: 'view' } });
                                 } else {
-                                  enqueueSnackbar('No requirement details found for editing', { variant: 'info' });
+                                  enqueueSnackbar('No requirement details found', { variant: 'info' });
                                 }
                               }}
                             >
-                              <i className="ti ti-edit" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {!isLoading && filtered.length === 0 && (
-                  <tr>
-                    <td colSpan={7} style={{ textAlign: 'center', padding: '40px 0', color: 'var(--g500)' }}>
-                      No mandates found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
-    </div>
+                              <i className="ti ti-eye" style={{ fontSize: 18 }} />
+                            </IconButton>
+                            {canCreate && (
+                              <IconButton 
+                                size="small" 
+                                onClick={() => {
+                                  const req = requirements.find(r => r.mandateId === m.id);
+                                  if (req) {
+                                    navigate('/requirements', { state: { requirement: req, mode: 'edit' } });
+                                  } else {
+                                    enqueueSnackbar('No requirement details found for editing', { variant: 'info' });
+                                  }
+                                }}
+                              >
+                                <i className="ti ti-edit" style={{ fontSize: 18 }} />
+                              </IconButton>
+                            )}
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  {!isLoading && filtered.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4, color: '#6B7C93' }}>
+                        No mandates found
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
+          </Box>
+        </Card>
+      </Box>
 
-      {open && (
-        <div className="modal visible" style={{ zIndex: 1300 }}>
-          <div className="modal-box" style={{ maxWidth: 550 }}>
-            <div className="modal-hd">
-              <span className="modal-title">{editing ? 'Edit Mandate' : 'Create New Mandate'}</span>
-              <button className="btn btn-ghost" onClick={() => setOpen(false)}>
-                <i className="ti ti-x" />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="modal-bd">
-                <div className="form-group">
-                  <label className="form-label">Mandate Name</label>
-                  <input {...register('companyName')} className={`form-input ${errors.companyName ? 'error' : ''}`} />
-                  {errors.companyName && <span className="error-text">{errors.companyName.message}</span>}
-                </div>
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label className="form-label">Client</label>
-                    <select {...register('clientId')} className={`form-input ${errors.clientId ? 'error' : ''}`}>
-                      <option value="">Select client...</option>
-                      {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Type</label>
-                    <select {...register('mandateType')} className="form-input">
-                      <option value="NEW">NEW</option>
-                      <option value="EXPANSION">EXPANSION</option>
-                      <option value="REPLACEMENT">REPLACEMENT</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label className="form-label">Contract Ref</label>
-                    <input {...register('contractRef')} className="form-input" />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Locations (comma separated)</label>
-                    <input {...register('locations')} className="form-input" />
-                  </div>
-                </div>
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label className="form-label">Start Date</label>
-                    <input type="date" {...register('startDate')} className="form-input" />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Onboarding Date</label>
-                    <input type="date" {...register('onboardingDate')} className="form-input" />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Notes</label>
-                  <textarea {...register('notes')} className="form-input" rows={3} />
-                </div>
-              </div>
-              <div className="modal-ft">
-                <button type="button" className="btn btn-ghost" onClick={() => setOpen(false)}>Cancel</button>
-                <LoadingButton type="submit" loading={creating || updating}>
-                  {editing ? 'Update' : 'Create'} Mandate
-                </LoadingButton>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 2 } }}>
+        <DialogTitle sx={{ borderBottom: '1px solid #E5EBF0', pb: 2 }}>
+          <Typography sx={{ fontSize: 18, fontWeight: 600 }}>{editing ? 'Edit Mandate' : 'Create New Mandate'}</Typography>
+        </DialogTitle>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogContent sx={{ p: 3 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField fullWidth label="Mandate Name" size="small" {...register('companyName')} error={!!errors.companyName} helperText={errors.companyName?.message} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth size="small" error={!!errors.clientId}>
+                  <InputLabel>Client</InputLabel>
+                  <Select label="Client" {...register('clientId')} defaultValue="">
+                    <MenuItem value=""><em>Select client...</em></MenuItem>
+                    {clients.map((c) => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
+                  </Select>
+                  {errors.clientId && <FormHelperText>{errors.clientId.message}</FormHelperText>}
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Type</InputLabel>
+                  <Select label="Type" {...register('mandateType')} defaultValue="NEW">
+                    <MenuItem value="NEW">NEW</MenuItem>
+                    <MenuItem value="EXPANSION">EXPANSION</MenuItem>
+                    <MenuItem value="REPLACEMENT">REPLACEMENT</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField fullWidth label="Contract Ref" size="small" {...register('contractRef')} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField fullWidth label="Locations (comma separated)" size="small" {...register('locations')} error={!!errors.locations} helperText={errors.locations?.message} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField fullWidth label="Start Date" type="date" size="small" InputLabelProps={{ shrink: true }} {...register('startDate')} error={!!errors.startDate} helperText={errors.startDate?.message} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField fullWidth label="Onboarding Date" type="date" size="small" InputLabelProps={{ shrink: true }} {...register('onboardingDate')} error={!!errors.onboardingDate} helperText={errors.onboardingDate?.message} />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField fullWidth label="Notes" size="small" multiline rows={3} {...register('notes')} />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions sx={{ p: 2, borderTop: '1px solid #E5EBF0' }}>
+            <Button onClick={() => setOpen(false)} color="inherit">Cancel</Button>
+            <LoadingButton type="submit" variant="contained" color="primary" loading={creating || updating}>
+              {editing ? 'Update' : 'Create'} Mandate
+            </LoadingButton>
+          </DialogActions>
+        </form>
+      </Dialog>
     </>
   );
 };

@@ -1,9 +1,9 @@
 import React from 'react';
 import {
   Box, Chip, Avatar, Tooltip, LinearProgress, CircularProgress,
-  Typography, alpha, useTheme,
+  Typography, alpha, useTheme, Button
 } from '@mui/material';
-import type { ChipProps } from '@mui/material';
+import type { ChipProps, ButtonProps } from '@mui/material';
 import type {
   CandidateStatus, MappingStatus, MandateStatus,
   LOIStatus, DriveStatus, UserRole,
@@ -211,33 +211,33 @@ export const SectionCard: React.FC<{
   );
 };
 // ─── Loading Button ──────────────────────────────────────────────────────────
-interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+
+interface LoadingButtonProps extends Omit<ButtonProps, 'variant'> {
   loading?: boolean;
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'ghost';
+  variant?: ButtonProps['variant'] | 'primary' | 'secondary' | 'danger' | 'success' | 'ghost';
   icon?: React.ReactNode;
 }
 
 export const LoadingButton: React.FC<LoadingButtonProps> = ({ 
   loading, 
-  variant = 'primary', 
+  variant = 'contained', 
+  color = 'primary',
   icon, 
   children, 
-  className = '', 
   ...props 
 }) => {
+  const muiVariant = (variant === 'primary' || variant === 'secondary' || variant === 'danger' || variant === 'success' || variant === 'ghost') ? 'contained' : variant;
+  
   return (
-    <button 
-      className={`btn btn-${variant} ${className} ${loading ? 'loading' : ''}`}
+    <Button 
+      variant={muiVariant}
+      color={color}
       disabled={loading || props.disabled}
+      startIcon={loading ? <CircularProgress size={16} color="inherit" /> : icon}
       {...props}
     >
-      {loading ? (
-        <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} />
-      ) : icon ? (
-        <span style={{ marginRight: 8, display: 'flex' }}>{icon}</span>
-      ) : null}
       {children}
-    </button>
+    </Button>
   );
 };
 // ─── Page Loader ─────────────────────────────────────────────────────────────

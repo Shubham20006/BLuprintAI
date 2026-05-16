@@ -1,6 +1,24 @@
 import React from 'react';
 import { useSnackbar } from 'notistack';
 import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  Grid,
+  Avatar,
+  Chip,
+  TextField,
+  RadioGroup,
+  Radio,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+  InputAdornment,
+  Divider,
+  Paper
+} from '@mui/material';
+import {
   useDiscussionLogs, useAllMappingLineItems,
   useCandidates, useMappings, useRequirements,
   useCreateDiscussionLog, useUpdateCandidate,
@@ -83,22 +101,26 @@ export const DiscussionsPage: React.FC = () => {
 
   return (
     <>
-      <div className="topbar">
-        <div className="topbar-left">
-          <span className="breadcrumb">Discussion Queue / <span>{pendingItems.length} pending contacts</span></span>
-        </div>
-        <div className="topbar-right">
-          <span className="badge mapping" style={{ fontSize: 13, padding: '4px 12px', borderRadius: 12 }}>{pendingItems.length} Pending</span>
-        </div>
-      </div>
+      <Box sx={{ bgcolor: '#fff', borderBottom: '1px solid #E5EBF0', px: 2, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+          <Typography sx={{ fontSize: 15, color: '#6B7C93' }}>
+            Discussion Queue / <Box component="span" sx={{ color: '#111827', fontWeight: 500 }}>{pendingItems.length} pending contacts</Box>
+          </Typography>
+        </Box>
+        <Box>
+          <Chip label={`${pendingItems.length} Pending`} size="small" sx={{ bgcolor: '#DBEAFE', color: '#1D4ED8', fontWeight: 600, borderRadius: 3 }} />
+        </Box>
+      </Box>
 
-      <div className="content">
+      <Box sx={{ p: 3, minHeight: 'calc(100vh - 60px)', bgcolor: '#F8FAFC' }}>
         {pendingItems.length > 0 ? (
-          <div style={{ display: 'flex', gap: 20, minHeight: 'calc(100vh - 48px)' }}>
+          <Grid container spacing={3}>
             {/* Left Column: List */}
-            <div style={{ width: 450, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--g500)', letterSpacing: '0.05em', marginBottom: 4 }}>CANDIDATES TO CONTACT</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <Grid item xs={12} md={5} lg={4}>
+              <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#6B7C93', letterSpacing: '0.05em', mb: 2 }}>
+                CANDIDATES TO CONTACT
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 {pendingItems.map(li => {
                   const cand = candidates.find(c => c.id === li.candidateId);
                   const mapping = mappings.find(m => m.id === li.mappingId);
@@ -107,187 +129,181 @@ export const DiscussionsPage: React.FC = () => {
                   const isActive = selectedItemId === li.id;
 
                   return (
-                    <div 
+                    <Card 
                       key={li.id}
-                      className={`panel ${isActive ? 'active' : ''}`}
                       onClick={() => setSelectedItemId(li.id)}
-                      style={{ 
+                      sx={{ 
                         cursor: 'pointer', 
-                        padding: '16px 20px', 
-                        margin: 0,
-                        border: isActive ? '2px solid var(--blue)' : '1px solid var(--g200)',
-                        position: 'relative'
+                        p: 2, 
+                        border: isActive ? '2px solid' : '1px solid',
+                        borderColor: isActive ? 'primary.main' : '#E5EBF0',
+                        boxShadow: isActive ? '0 4px 12px rgba(37,99,235,0.1)' : 'none',
+                        position: 'relative',
+                        transition: 'all 0.2s',
+                        borderRadius: 2
                       }}
                     >
-                      <div style={{ position: 'absolute', top: 16, right: 20 }}>
-                        <span style={{ 
-                          fontSize: 12, 
-                          fontWeight: 700, 
-                          padding: '2px 10px', 
-                          borderRadius: 10, 
-                          background: prio.bg, 
-                          color: prio.color 
-                        }}>
-                          {prio.label}
-                        </span>
-                      </div>
-                      <div style={{ display: 'flex', gap: 16 }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                          <div className="sb-avatar" style={{ width: 44, height: 44, background: 'var(--blue)', color: '#fff', fontSize: 17 }}>
+                      <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+                        <Chip label={prio.label} size="small" sx={{ bgcolor: prio.bg, color: prio.color, fontWeight: 700, fontSize: 11, height: 20 }} />
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                          <Avatar sx={{ width: 44, height: 44, bgcolor: 'primary.main', fontSize: 16, fontWeight: 600 }}>
                             {cand?.avatar || cand?.name.slice(0, 2).toUpperCase()}
-                          </div>
-                          <div style={{ width: 10, height: 10, borderRadius: '50%', background: prio.dot }} />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 17 }}>{cand?.name}</div>
-                          <div style={{ fontSize: 13, color: 'var(--g500)', marginTop: 4 }}>
+                          </Avatar>
+                          <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: prio.dot }} />
+                        </Box>
+                        <Box sx={{ flex: 1, pr: 6 }}>
+                          <Typography sx={{ fontWeight: 700, color: '#111827', fontSize: 16 }}>{cand?.name}</Typography>
+                          <Typography sx={{ fontSize: 13, color: '#6B7C93', mt: 0.5 }}>
                             {cand?.stream} • {li.proposedTech} • {req?.requirementCode.split('-').pop()}
-                          </div>
-                          <div style={{ display: 'flex', gap: 16, marginTop: 10 }}>
-                            <div style={{ fontSize: 13, color: 'var(--navy)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <i className="ti ti-phone" style={{ fontSize: 16 }} /> {cand?.phone}
-                            </div>
-                            <div style={{ fontSize: 13, color: 'var(--navy)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <i className="ti ti-mail" style={{ fontSize: 16 }} /> {cand?.email}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                          </Typography>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 1.5 }}>
+                            <Typography sx={{ fontSize: 13, color: '#111827', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <i className="ti ti-phone" style={{ fontSize: 16, color: '#6B7C93' }} /> {cand?.phone}
+                            </Typography>
+                            <Typography sx={{ fontSize: 13, color: '#111827', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <i className="ti ti-mail" style={{ fontSize: 16, color: '#6B7C93' }} /> {cand?.email}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Card>
                   );
                 })}
-              </div>
-            </div>
+              </Box>
+            </Grid>
 
             {/* Right Column: Detail Form */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--g500)', letterSpacing: '0.05em', marginBottom: 4 }}>
+            <Grid item xs={12} md={7} lg={8}>
+              <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#6B7C93', letterSpacing: '0.05em', mb: 2 }}>
                 LOG DISCUSSION OUTCOME — {selectedCand?.name.toUpperCase()}
-              </div>
+              </Typography>
               
-              <div className="panel" style={{ marginBottom: 40 }}>
-                <div className="panel-body" style={{ padding: 30 }}>
+              <Card sx={{ borderRadius: 3, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                <Box sx={{ p: 4 }}>
                   
                   {/* Context Box */}
-                  <div style={{ background: 'var(--g50)', borderRadius: 12, padding: 24, marginBottom: 30, border: '1px solid var(--g200)' }}>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--navy)' }}>
+                  <Box sx={{ bgcolor: '#F8FAFC', borderRadius: 2, p: 3, mb: 4, border: '1px solid #E5EBF0' }}>
+                    <Typography sx={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>
                       Mapped for: {selectedReq?.requirementCode}
-                    </div>
-                    <div style={{ display: 'flex', gap: 24, marginTop: 10, fontSize: 14, color: 'var(--g600)' }}>
-                      <span>{selectedReq?.openPositions} positions</span>
-                      <span>{selectedReq?.location}</span>
-                      <span>Onboarding {selectedReq?.onboardingDate ? formatDate(selectedReq.onboardingDate) : 'TBD'}</span>
-                      <span>{selectedReq?.intakeType} model</span>
-                    </div>
-                  </div>
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mt: 1.5 }}>
+                      <Typography sx={{ fontSize: 14, color: '#475569', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <i className="ti ti-users" /> {selectedReq?.openPositions} positions
+                      </Typography>
+                      <Typography sx={{ fontSize: 14, color: '#475569', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <i className="ti ti-map-pin" /> {selectedReq?.location}
+                      </Typography>
+                      <Typography sx={{ fontSize: 14, color: '#475569', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <i className="ti ti-calendar-event" /> Onboarding {selectedReq?.onboardingDate ? formatDate(selectedReq.onboardingDate) : 'TBD'}
+                      </Typography>
+                      <Typography sx={{ fontSize: 14, color: '#475569', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <i className="ti ti-briefcase" /> {selectedReq?.intakeType} model
+                      </Typography>
+                    </Box>
+                  </Box>
 
-                  <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+                  <form onSubmit={handleSubmit}>
                     {/* Outcomes */}
-                    <div>
-                      <label className="form-label" style={{ marginBottom: 12 }}>Discussion outcome</label>
-                      <div style={{ display: 'flex', gap: 15 }}>
+                    <Box sx={{ mb: 4 }}>
+                      <Typography sx={{ fontSize: 14, fontWeight: 600, color: '#111827', mb: 1.5 }}>Discussion outcome</Typography>
+                      <Grid container spacing={2}>
                         {(['Accepted', 'Declined', 'Reschedule'] as const).map(o => (
-                          <div 
-                            key={o}
-                            onClick={() => setOutcome(o)}
-                            style={{ 
-                              flex: 1, 
-                              padding: '16px', 
-                              borderRadius: 8, 
-                              border: outcome === o ? '2px solid var(--green)' : '1px solid var(--g300)',
-                              background: '#fff',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 12,
-                              transition: 'all 0.15s'
-                            }}
-                          >
-                            <div style={{ 
-                              width: 20, 
-                              height: 20, 
-                              borderRadius: '50%', 
-                              border: '2px solid ' + (outcome === o ? 'var(--green)' : 'var(--g300)'),
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}>
-                              {outcome === o && <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--green)' }} />}
-                            </div>
-                            <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--navy)' }}>{o}</span>
-                          </div>
+                          <Grid item xs={12} sm={4} key={o}>
+                            <Paper
+                              variant="outlined"
+                              onClick={() => setOutcome(o)}
+                              sx={{ 
+                                p: 2, 
+                                borderRadius: 2, 
+                                border: outcome === o ? '2px solid' : '1px solid',
+                                borderColor: outcome === o ? '#16A34A' : '#CBD5E1',
+                                bgcolor: '#fff',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
+                                transition: 'all 0.15s'
+                              }}
+                            >
+                              <Radio 
+                                checked={outcome === o}
+                                value={o}
+                                sx={{ p: 0, '&.Mui-checked': { color: '#16A34A' } }}
+                              />
+                              <Typography sx={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>{o}</Typography>
+                            </Paper>
+                          </Grid>
                         ))}
-                      </div>
-                    </div>
+                      </Grid>
+                    </Box>
 
                     {/* Notes */}
-                    <div className="form-group">
-                      <label className="form-label">Discussion notes</label>
-                      <textarea 
-                        className="form-input" 
-                        rows={6} 
+                    <Box sx={{ mb: 4 }}>
+                      <TextField 
+                        fullWidth
+                        label="Discussion notes"
+                        multiline
+                        rows={5}
                         placeholder="Candidate showed strong interest. Confirmed availability for location..."
                         value={notes}
                         onChange={e => setNotes(e.target.value)}
                         required
-                        style={{ padding: 15 }}
+                        InputLabelProps={{ shrink: true }}
                       />
-                    </div>
+                    </Box>
 
                     {/* Follow up */}
-                    <div className="form-group">
-                      <label className="form-label">Next action date (if rescheduled)</label>
-                      <input 
-                        type="date" 
-                        className="form-input" 
+                    <Box sx={{ mb: 4 }}>
+                      <TextField 
+                        type="date"
+                        fullWidth
+                        label="Next action date (if rescheduled)"
                         value={followUpDate}
                         onChange={e => setFollowUpDate(e.target.value)}
-                        style={{ height: 44 }}
+                        InputLabelProps={{ shrink: true }}
                       />
-                    </div>
+                    </Box>
 
-                    <button 
+                    <Button 
                       type="submit" 
-                      className="btn btn-primary" 
-                      style={{ 
-                        width: '100%', 
-                        height: 48, 
-                        fontSize: 17, 
-                        fontWeight: 700,
-                        marginTop: 10,
-                        borderRadius: 8,
-                        background: 'var(--blue)'
-                      }} 
+                      variant="contained"
+                      color="primary"
                       disabled={isPending}
+                      fullWidth
+                      sx={{ py: 1.5, fontSize: 16, fontWeight: 700, borderRadius: 2 }}
                     >
                       {isPending ? 'Submitting...' : 'Submit Outcome'}
-                    </button>
+                    </Button>
                   </form>
-                </div>
-              </div>
-            </div>
-          </div>
+                </Box>
+              </Card>
+            </Grid>
+          </Grid>
         ) : (
-          <div style={{ height: 'calc(100vh - 150px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20 }}>
-            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--green-light)', color: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 42, border: '4px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+          <Box sx={{ height: 'calc(100vh - 150px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 3 }}>
+            <Box sx={{ width: 80, height: 80, borderRadius: '50%', bgcolor: '#DCFCE7', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, border: '4px solid #fff', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
               <i className="ti ti-circle-check" />
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontWeight: 700, color: 'var(--navy)', fontSize: 24 }}>All caught up!</div>
-              <div style={{ color: 'var(--g500)', fontSize: 16, marginTop: 8, maxWidth: 300, lineHeight: 1.5 }}>
+            </Box>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography sx={{ fontWeight: 700, color: '#111827', fontSize: 24 }}>All caught up!</Typography>
+              <Typography sx={{ color: '#6B7C93', fontSize: 16, mt: 1, maxWidth: 300, lineHeight: 1.5, mx: 'auto' }}>
                 There are no more candidates pending for discussion at this moment.
-              </div>
-              <button 
-                className="btn btn-secondary" 
-                style={{ marginTop: 24, padding: '10px 24px' }}
+              </Typography>
+              <Button 
+                variant="outlined" 
+                color="primary"
+                sx={{ mt: 3, px: 3, borderRadius: 2 }}
                 onClick={() => window.location.reload()}
+                startIcon={<i className="ti ti-refresh" />}
               >
-                <i className="ti ti-refresh" /> Refresh Queue
-              </button>
-            </div>
-          </div>
+                Refresh Queue
+              </Button>
+            </Box>
+          </Box>
         )}
-      </div>
+      </Box>
     </>
   );
 };

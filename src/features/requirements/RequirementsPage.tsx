@@ -13,6 +13,16 @@ import {
   TextField,
   ThemeProvider,
   createTheme,
+  Box,
+  Typography,
+  Button,
+  Card,
+  Grid,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  IconButton
 } from '@mui/material';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -508,743 +518,167 @@ export const RequirementsPage: React.FC = () => {
         dateAdapter={AdapterDayjs}
       >
         <>
-          <div className="topbar">
-            <div className="topbar-left">
-              <span className="breadcrumb">
-                Mandates /{' '}
-                <span>
-                  {isView
-                    ? 'View Mandate'
-                    : isEdit
-                      ? 'Edit Mandate'
-                      : 'Create New Mandate'}
-                </span>
-              </span>
-            </div>
+          <Box sx={{ bgcolor: '#fff', borderBottom: '1px solid #E5EBF0', px: 2, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+              <Typography sx={{ fontSize: 15, color: '#6B7C93' }}>
+                Mandates / <Box component="span" sx={{ color: '#111827', fontWeight: 500 }}>
+                  {isView ? 'View Mandate' : isEdit ? 'Edit Mandate' : 'Create New Mandate'}
+                </Box>
+              </Typography>
+            </Box>
+            <Button variant="outlined" size="small" color="inherit" onClick={() => navigate(-1)}>
+              <i className="ti ti-arrow-left" style={{ marginRight: 6 }} /> Back
+            </Button>
+          </Box>
 
-            <div className="topbar-right">
-              <button
-                className="btn btn-ghost btn-sm"
-                onClick={() => navigate(-1)}
-              >
-                <i className="ti ti-arrow-left" />
-                Back
-              </button>
-            </div>
-          </div>
+          <Box sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            <Box sx={{ width: { xs: '100%', md: 'calc(50% - 8px)' }, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Card sx={{ borderRadius: 2 }}>
+                <Box sx={{ p: '12px 16px', borderBottom: '1px solid #E5EBF0' }}>
+                  <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Mandate Details</Typography>
+                </Box>
+                <Box sx={{ p: 2 }}>
+                  <form id="req-form" onSubmit={handleSubmit(onSubmit)}>
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Company</Typography>
+                        <Controller control={control} name="companyName" render={({ field }) => (
+                          <Autocomplete {...autoCompleteProps(field)} options={clients.map((c) => c.name)} renderInput={(params) => <TextField {...params} placeholder="Enter Company Name..." />} />
+                        )} />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Short Name</Typography>
+                        <input className="form-input" disabled={isView} placeholder="e.g. APEX" style={{ height: 34, fontSize: 13, padding: '6px 12px', width: '100%', border: '1px solid #CBD5E1', borderRadius: 10 }} {...register('shortName')} />
+                      </Grid>
+                    </Grid>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns:
-                '1fr 1fr',
-              gap: '1rem',
-              margin: '1rem',
-              alignItems: 'start',
-            }}
-          >
-            {/* LEFT */}
-            <div>
-              <div className="panel">
-                <div className="panel-hd">
-                  <span className="panel-title">
-                    Mandate Details
-                  </span>
-                </div>
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Mandate type</Typography>
+                        <Controller control={control} name="mandateType" render={({ field }) => (
+                          <Autocomplete {...autoCompleteProps(field)} options={['NEW', 'RENEW', 'EXT', 'SUB']} renderInput={(params) => <TextField {...params} placeholder="Select Mandate Type..." />} />
+                        )} />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Open positions</Typography>
+                        <input className="form-input" type="number" disabled={isView} placeholder="e.g. 10" style={{ height: 34, fontSize: 13, padding: '6px 12px', width: '100%', border: '1px solid #CBD5E1', borderRadius: 10 }} {...register('openPositions')} />
+                      </Grid>
+                    </Grid>
 
-                <div className="panel-body">
-                  <form
-                    id="req-form"
-                    onSubmit={handleSubmit(
-                      onSubmit
-                    )}
-                  >
-                    <div className="form-grid">
-                      <div className="form-group">
-                        <label className="form-label">
-                          Company
-                        </label>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Technology stack</Typography>
+                      <Controller control={control} name="techStack" render={({ field }) => (
+                        <Autocomplete {...autoCompleteProps(field)} options={['DotNetStack — .NET / C#', 'JavaStack — Java Full Stack', 'AIMLDataEng — AI/ML & Data Engineering', 'DeepTech', 'Backend', 'Python — Python Development']} renderInput={(params) => <TextField {...params} placeholder="Select Tech Stack..." />} />
+                      )} />
+                    </Box>
 
-                        <Controller
-                          control={control}
-                          name="companyName"
-                          render={({
-                            field,
-                          }) => (
-                            <Autocomplete
-                              {...autoCompleteProps(
-                                field
-                              )}
-                              options={clients.map(
-                                (c) => c.name
-                              )}
-                              renderInput={(
-                                params
-                              ) => (
-                                <TextField
-                                  {...params}
-                                  placeholder="Enter Company Name..."
-                                />
-                              )}
-                            />
-                          )}
-                        />
-                      </div>
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Engagement model</Typography>
+                        <Controller control={control} name="engagementModel" render={({ field }) => (
+                          <Autocomplete {...autoCompleteProps(field)} options={['FresherISA', 'FresherFixed', 'LateralISA', 'UpSkilling']} renderInput={(params) => <TextField {...params} placeholder="Select Engagement Model..." />} />
+                        )} />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Job location</Typography>
+                        <Controller control={control} name="location" render={({ field }) => (
+                          <Autocomplete {...autoCompleteProps(field)} options={['Hyderabad, Telangana', 'Bangalore, Karnataka', 'Pune, Maharashtra', 'Chennai, Tamil Nadu']} renderInput={(params) => <TextField {...params} placeholder="Select Job Location..." />} />
+                        )} />
+                      </Grid>
+                    </Grid>
 
-                      <div className="form-group">
-                        <label className="form-label">
-                          Short Name
-                        </label>
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Mandate date</Typography>
+                        <Controller control={control} name="mandateDate" render={({ field }) => (
+                          <DatePicker disabled={isView} value={field.value ? dayjs(field.value) : null} onChange={(val) => field.onChange(val ? val.format('YYYY-MM-DD') : '')} slotProps={{ textField: { size: 'small', fullWidth: true } }} />
+                        )} />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Onboarding date</Typography>
+                        <Controller control={control} name="onboardingDate" render={({ field }) => (
+                          <DatePicker disabled={isView} value={field.value ? dayjs(field.value) : null} onChange={(val) => field.onChange(val ? val.format('YYYY-MM-DD') : '')} slotProps={{ textField: { size: 'small', fullWidth: true } }} />
+                        )} />
+                      </Grid>
+                    </Grid>
 
-                        <input
-                          className="form-input"
-                          disabled={isView}
-                          placeholder="e.g. APEX"
-                          style={{
-                            height: 34,
-                            fontSize: 13,
-                            padding:
-                              '6px 12px',
-                          }}
-                          {...register(
-                            'shortName'
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-grid">
-                      <div className="form-group">
-                        <label className="form-label">
-                          Mandate type
-                        </label>
-
-                        <Controller
-                          control={control}
-                          name="mandateType"
-                          render={({
-                            field,
-                          }) => (
-                            <Autocomplete
-                              {...autoCompleteProps(
-                                field
-                              )}
-                              options={[
-                                'NEW',
-                                'RENEW',
-                                'EXT',
-                                'SUB',
-                              ]}
-                              renderInput={(
-                                params
-                              ) => (
-                                <TextField
-                                  {...params}
-                                  placeholder="Select Mandate Type..."
-                                />
-                              )}
-                            />
-                          )}
-                        />
-                      </div>
-
-                      <div className="form-group">
-                        <label className="form-label">
-                          Open positions
-                        </label>
-
-                        <input
-                          className="form-input"
-                          type="number"
-                          disabled={isView}
-                          placeholder="e.g. 10"
-                          style={{
-                            height: 34,
-                            fontSize: 13,
-                            padding:
-                              '6px 12px',
-                          }}
-                          {...register(
-                            'openPositions'
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        Technology stack
-                      </label>
-
-                      <Controller
-                        control={control}
-                        name="techStack"
-                        render={({ field }) => (
-                          <Autocomplete
-                            {...autoCompleteProps(
-                              field
-                            )}
-                            options={[
-                              'DotNetStack — .NET / C#',
-                              'JavaStack — Java Full Stack',
-                              'AIMLDataEng — AI/ML & Data Engineering',
-                              'DeepTech',
-                              'Backend',
-                              'Python — Python Development',
-                            ]}
-                            renderInput={(
-                              params
-                            ) => (
-                              <TextField
-                                {...params}
-                                placeholder="Select Tech Stack..."
-                              />
-                            )}
-                          />
-                        )}
-                      />
-                    </div>
-
-                    <div className="form-grid">
-                      <div className="form-group">
-                        <label className="form-label">
-                          Engagement model
-                        </label>
-
-                        <Controller
-                          control={control}
-                          name="engagementModel"
-                          render={({ field }) => (
-                            <Autocomplete
-                              {...autoCompleteProps(
-                                field
-                              )}
-                              options={[
-                                'FresherISA',
-                                'FresherFixed',
-                                'LateralISA',
-                                'UpSkilling',
-                              ]}
-                              renderInput={(
-                                params
-                              ) => (
-                                <TextField
-                                  {...params}
-                                  placeholder="Select Engagement Model..."
-                                />
-                              )}
-                            />
-                          )}
-                        />
-                      </div>
-
-                      <div className="form-group">
-                        <label className="form-label">
-                          Job location
-                        </label>
-
-                        <Controller
-                          control={control}
-                          name="location"
-                          render={({ field }) => (
-                            <Autocomplete
-                              {...autoCompleteProps(
-                                field
-                              )}
-                              options={[
-                                'Hyderabad, Telangana',
-                                'Bangalore, Karnataka',
-                                'Pune, Maharashtra',
-                                'Chennai, Tamil Nadu',
-                              ]}
-                              renderInput={(
-                                params
-                              ) => (
-                                <TextField
-                                  {...params}
-                                  placeholder="Select Job Location..."
-                                />
-                              )}
-                            />
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-grid">
-                      <div className="form-group">
-                        <label className="form-label">
-                          Mandate date
-                        </label>
-
-                        <Controller
-                          control={control}
-                          name="mandateDate"
-                          render={({ field }) => (
-                            <DatePicker
-                              disabled={isView}
-                              value={
-                                field.value
-                                  ? dayjs(
-                                    field.value
-                                  )
-                                  : null
-                              }
-                              onChange={(
-                                value
-                              ) =>
-                                field.onChange(
-                                  value
-                                    ? value.format(
-                                      'YYYY-MM-DD'
-                                    )
-                                    : ''
-                                )
-                              }
-                              slotProps={{
-                                textField: {
-                                  size:
-                                    'small',
-                                },
-                              }}
-                            />
-                          )}
-                        />
-                      </div>
-
-                      <div className="form-group">
-                        <label className="form-label">
-                          Onboarding date
-                        </label>
-
-                        <Controller
-                          control={control}
-                          name="onboardingDate"
-                          render={({ field }) => (
-                            <DatePicker
-                              disabled={isView}
-                              value={
-                                field.value
-                                  ? dayjs(
-                                    field.value
-                                  )
-                                  : null
-                              }
-                              onChange={(
-                                value
-                              ) =>
-                                field.onChange(
-                                  value
-                                    ? value.format(
-                                      'YYYY-MM-DD'
-                                    )
-                                    : ''
-                                )
-                              }
-                              slotProps={{
-                                textField: {
-                                  size:
-                                    'small',
-                                },
-                              }}
-                            />
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    <div
-                      className="form-group"
-                      style={{
-                        marginBottom: 0,
-                      }}
-                    >
-                      <label className="form-label">
-                        Notes (optional)
-                      </label>
-
-                      <textarea
-                        className="form-input"
-                        disabled={isView}
-                        rows={2}
-                        placeholder="Add any specific notes..."
-                        style={{
-                          fontSize: 13,
-                          padding:
-                            '8px 12px',
-                        }}
-                        {...register('notes')}
-                      />
-                    </div>
+                    <Box>
+                      <Typography sx={{ fontSize: 13, fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>Notes (optional)</Typography>
+                      <textarea className="form-input" disabled={isView} rows={2} placeholder="Add any specific notes..." style={{ fontSize: 13, padding: '8px 12px', width: '100%', border: '1px solid #CBD5E1', borderRadius: 10, fontFamily: 'inherit' }} {...register('notes')} />
+                    </Box>
                   </form>
-                </div>
-              </div>
+                </Box>
+              </Card>
 
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 8,
-                  justifyContent:
-                    'flex-end',
-                }}
-              >
-                <button
-                  className="btn btn-ghost"
-                  onClick={() =>
-                    navigate(-1)
-                  }
-                >
-                  Cancel
-                </button>
-
+              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                <Button variant="outlined" color="inherit" onClick={() => navigate(-1)}>Cancel</Button>
                 {!isView && (
-                  <LoadingButton
-                    type="submit"
-                    form="req-form"
-                    loading={isPending}
-                  >
-                    {isEdit
-                      ? 'Update Mandate'
-                      : 'Create Mandate'}
+                  <LoadingButton type="submit" form="req-form" loading={isPending}>
+                    {isEdit ? 'Update Mandate' : 'Create Mandate'}
                   </LoadingButton>
                 )}
-              </div>
-            </div>
+              </Box>
+            </Box>
 
-            {/* RIGHT */}
-            <div>
-              <div className="panel">
-                <div
-                  className="panel-hd"
-                  style={{
-                    background:
-                      'var(--purple-light)',
-                  }}
-                >
-                  <span
-                    className="panel-title"
-                    style={{
-                      color:
-                        'var(--purple)',
-                    }}
-                  >
-                    <i
-                      className="ti ti-sparkles"
-                      aria-hidden="true"
-                      style={{
-                        marginRight: 5,
-                      }}
-                    />
-                    AI Requirement ID Generator
-                  </span>
+            <Box sx={{ width: { xs: '100%', md: 'calc(50% - 8px)' }, flexShrink: 0 }}>
+              <Card sx={{ borderRadius: 2 }}>
+                <Box sx={{ bgcolor: 'secondary.light', p: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography sx={{ fontSize: 15, fontWeight: 600, color: 'secondary.main', display: 'flex', alignItems: 'center' }}>
+                    <i className="ti ti-sparkles" style={{ marginRight: 6 }} /> AI Requirement ID Generator
+                  </Typography>
+                  <Box sx={{ bgcolor: 'secondary.light', color: 'secondary.main', border: '1px solid rgba(90,45,130,.2)', borderRadius: 1, px: 1, py: 0.25, fontSize: 11, fontWeight: 600 }}>Live Preview</Box>
+                </Box>
+                <Box sx={{ p: 2 }}>
+                  <Typography sx={{ fontSize: 13, color: 'text.secondary', mb: 1.5 }}>
+                    Generated automatically from your form inputs. The AI checks for duplicates and semantic conflicts.
+                  </Typography>
+                  
+                  <Box sx={{ p: 2, bgcolor: '#F8FAFC', border: '1px dashed #CBD5E1', borderRadius: 2, mb: 1.5 }}>
+                    <Typography sx={{ fontSize: 11, fontWeight: 600, color: 'text.secondary', mb: 1, textTransform: 'uppercase', letterSpacing: 0.5 }}>Generated Requirement ID</Typography>
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                      {previewId.split('-').map((part, i, arr) => (
+                        <React.Fragment key={i}>
+                          <Box sx={{ bgcolor: '#fff', border: '1px solid #E2E8F0', borderRadius: 1, px: 1, py: 0.5, fontSize: 13, fontWeight: 600, color: 'primary.main', fontFamily: 'monospace' }}>{part}</Box>
+                          {i < arr.length - 1 && <Box sx={{ color: '#CBD5E1', fontWeight: 600 }}>-</Box>}
+                        </React.Fragment>
+                      ))}
+                    </Box>
+                  </Box>
 
-                  <span
-                    className="section-tag"
-                    style={{
-                      background:
-                        'var(--purple-light)',
-                      color:
-                        'var(--purple)',
-                      border:
-                        '1px solid rgba(90,45,130,.2)',
-                    }}
-                  >
-                    Live Preview
-                  </span>
-                </div>
+                  <Box sx={{ mt: 1.5, p: 1, bgcolor: 'success.light', borderRadius: 1, border: '1px solid #6EE7B7', fontSize: 12, color: 'success.main', display: 'flex', gap: 1, alignItems: 'center' }}>
+                    <i className="ti ti-circle-check" style={{ fontSize: 16 }} />
+                    <span>No duplicate mandate detected. ID is unique and valid.</span>
+                  </Box>
 
-                <div className="panel-body">
-                  <div
-                    style={{
-                      fontSize: 13,
-                      color:
-                        'var(--g500)',
-                      marginBottom: 10,
-                    }}
-                  >
-                    Generated automatically from
-                    your form inputs. The AI
-                    checks for duplicates and
-                    semantic conflicts.
-                  </div>
+                  <Box sx={{ mt: 1.5 }}>
+                    <Typography sx={{ fontSize: 12, fontWeight: 600, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4, mb: 1 }}>ID Tag Breakdown</Typography>
+                    <Table size="small">
+                      <TableBody>
+                        {[
+                          { lbl: 'Client code', val: watchedShortName || '—' },
+                          { lbl: 'Mandate type', val: watchedMandateType || '—' },
+                          { lbl: 'Tech stack', val: techShort || '—' },
+                          { lbl: 'Engagement', val: watchedEngagement || '—' },
+                          { lbl: 'Date', val: monthDay || '—' },
+                          { lbl: 'Sequence no.', val: nextSeq },
+                        ].map((row, i) => (
+                          <TableRow key={i}>
+                            <TableCell sx={{ py: 0.5, border: 'none', color: 'text.secondary', fontSize: 12, px: 0 }}>{row.lbl}</TableCell>
+                            <TableCell sx={{ py: 0.5, border: 'none', fontWeight: 600, color: 'secondary.main', fontFamily: 'monospace', fontSize: 12, px: 0 }} align="right">{row.val}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Box>
 
-                  <div className="rid-box">
-                    <div className="rid-label">
-                      Generated Requirement ID
-                    </div>
-
-                    <div className="rid-value">
-                      {previewId
-                        .split('-')
-                        .map(
-                          (
-                            part,
-                            i,
-                            arr
-                          ) => (
-                            <React.Fragment
-                              key={i}
-                            >
-                              <span className="rid-tag">
-                                {part}
-                              </span>
-
-                              {i <
-                                arr.length -
-                                1 && '-'}
-                            </React.Fragment>
-                          )
-                        )}
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: 10,
-                      padding: 8,
-                      background:
-                        'var(--green-light)',
-                      borderRadius: 6,
-                      border:
-                        '1px solid #6EE7B7',
-                      fontSize: 12,
-                      color:
-                        'var(--green)',
-                      display: 'flex',
-                      gap: 6,
-                      alignItems:
-                        'center',
-                    }}
-                  >
-                    <i
-                      className="ti ti-circle-check"
-                      aria-hidden="true"
-                      style={{
-                        fontSize: 16,
-                      }}
-                    />
-
-                    <span>
-                      No duplicate mandate
-                      detected. ID is unique and
-                      valid.
-                    </span>
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: 10,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color:
-                          'var(--g500)',
-                        textTransform:
-                          'uppercase',
-                        letterSpacing:
-                          0.4,
-                        marginBottom: 6,
-                      }}
-                    >
-                      ID Tag Breakdown
-                    </div>
-
-                    <table
-                      style={{
-                        width: '100%',
-                        fontSize: 12,
-                      }}
-                    >
-                      <tbody>
-                        <tr>
-                          <td
-                            style={{
-                              padding:
-                                '3px 0',
-                              color:
-                                'var(--g500)',
-                            }}
-                          >
-                            Client code
-                          </td>
-
-                          <td
-                            style={{
-                              fontWeight: 600,
-                              color:
-                                'var(--navy)',
-                              fontFamily:
-                                'monospace',
-                            }}
-                          >
-                            {watchedShortName ||
-                              '—'}
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <td
-                            style={{
-                              padding:
-                                '3px 0',
-                              color:
-                                'var(--g500)',
-                            }}
-                          >
-                            Mandate type
-                          </td>
-
-                          <td
-                            style={{
-                              fontWeight: 600,
-                              color:
-                                'var(--navy)',
-                              fontFamily:
-                                'monospace',
-                            }}
-                          >
-                            {
-                              watchedMandateType
-                            }
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <td
-                            style={{
-                              padding:
-                                '3px 0',
-                              color:
-                                'var(--g500)',
-                            }}
-                          >
-                            Tech stack
-                          </td>
-
-                          <td
-                            style={{
-                              fontWeight: 600,
-                              color:
-                                'var(--navy)',
-                              fontFamily:
-                                'monospace',
-                            }}
-                          >
-                            {techShort}
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <td
-                            style={{
-                              padding:
-                                '3px 0',
-                              color:
-                                'var(--g500)',
-                            }}
-                          >
-                            Engagement
-                          </td>
-
-                          <td
-                            style={{
-                              fontWeight: 600,
-                              color:
-                                'var(--navy)',
-                              fontFamily:
-                                'monospace',
-                            }}
-                          >
-                            {
-                              watchedEngagement
-                            }
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <td
-                            style={{
-                              padding:
-                                '3px 0',
-                              color:
-                                'var(--g500)',
-                            }}
-                          >
-                            Date
-                          </td>
-
-                          <td
-                            style={{
-                              fontWeight: 600,
-                              color:
-                                'var(--navy)',
-                              fontFamily:
-                                'monospace',
-                            }}
-                          >
-                            {monthDay}
-                          </td>
-                        </tr>
-
-                        <tr>
-                          <td
-                            style={{
-                              padding:
-                                '3px 0',
-                              color:
-                                'var(--g500)',
-                            }}
-                          >
-                            Sequence no.
-                          </td>
-
-                          <td
-                            style={{
-                              fontWeight: 600,
-                              color:
-                                'var(--navy)',
-                              fontFamily:
-                                'monospace',
-                            }}
-                          >
-                            {nextSeq}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: 10,
-                      padding: 8,
-                      background:
-                        'var(--blue-light)',
-                      borderRadius: 6,
-                      fontSize: 12,
-                      color:
-                        'var(--navy)',
-                    }}
-                  >
-                    <i
-                      className="ti ti-info-circle"
-                      aria-hidden="true"
-                      style={{
-                        marginRight: 4,
-                      }}
-                    />
-                    Sequence number
-                    auto-increments. You can
-                    request regeneration if
-                    needed.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                  <Box sx={{ mt: 1.5, p: 1, bgcolor: 'info.light', borderRadius: 1, fontSize: 12, color: 'secondary.main', display: 'flex', gap: 1, alignItems: 'center' }}>
+                    <i className="ti ti-info-circle" />
+                    <span>Sequence number auto-increments. You can request regeneration if needed.</span>
+                  </Box>
+                </Box>
+              </Card>
+            </Box>
+          </Box>
         </>
       </LocalizationProvider>
     </ThemeProvider>

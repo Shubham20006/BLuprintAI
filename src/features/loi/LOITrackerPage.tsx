@@ -1,6 +1,29 @@
 import React from 'react';
 import { useSnackbar } from 'notistack';
 import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  Grid,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  Select,
+  MenuItem,
+  InputLabel,
+  Checkbox,
+  LinearProgress
+} from '@mui/material';
+import {
   useLOIs, useCandidates, useRequirements, useMappings,
   useCreateLOI, useUpdateLOI, useUpdateCandidate,
   useDiscussionLogs, useAllMappingLineItems, useUpdateRequirement,
@@ -8,6 +31,7 @@ import {
 import { useSessionStore } from '../../store';
 import { can } from '../../auth/permissions';
 import { formatDate, generateId } from '../../utils';
+import { LoadingButton } from '../../components/shared';
 import type { LOI } from '../../types';
 
 export const LOITrackerPage: React.FC = () => {
@@ -148,183 +172,207 @@ export const LOITrackerPage: React.FC = () => {
 
   return (
     <>
-      <div className="topbar">
-        <div className="topbar-left">
-          <span className="breadcrumb">Fellowship MIS / <span>LOI Tracker</span></span>
-        </div>
-        <div className="topbar-right">
+      <Box sx={{ bgcolor: '#fff', borderBottom: '1px solid #E5EBF0', px: 2, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+          <Typography sx={{ fontSize: 15, color: '#6B7C93' }}>
+            Fellowship MIS / <Box component="span" sx={{ color: '#111827', fontWeight: 500 }}>LOI Tracker</Box>
+          </Typography>
+        </Box>
+        <Box>
           {canIssue && (
-            <button className="btn btn-primary" onClick={() => setOpen(true)}>
-              <i className="ti ti-send" /> Issue LOI
-            </button>
+            <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+              <i className="ti ti-send" style={{ marginRight: 6 }} /> Issue LOI
+            </Button>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      <div className="content">
-        <div className="kpi-row">
-          <div className="kpi" style={{ borderTopColor: '#f59e0b' }}>
-            <div className="kpi-label">Sent</div>
-            <div className="kpi-val">{stats.sent}</div>
-            <div className="kpi-sub">Awaiting Signature</div>
-          </div>
-          <div className="kpi" style={{ borderTopColor: '#10b981' }}>
-            <div className="kpi-label">Signed</div>
-            <div className="kpi-val">{stats.signed}</div>
-            <div className="kpi-sub">Completed</div>
-          </div>
-          <div className="kpi" style={{ borderTopColor: '#6366f1' }}>
-            <div className="kpi-label">Total Issued</div>
-            <div className="kpi-val">{stats.total}</div>
-            <div className="kpi-sub">LOIs Processed</div>
-          </div>
-          <div className="kpi">
-            <div className="kpi-label">Conversion</div>
-            <div className="kpi-val">{stats.total ? Math.round((stats.signed / stats.total) * 100) : 0}%</div>
-            <div className="kpi-sub">Sign Rate</div>
-          </div>
-        </div>
+      <Box sx={{ p: 3 }}>
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ p: 2.5, borderRadius: 2, borderTop: '4px solid #F59E0B' }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#6B7C93', textTransform: 'uppercase', mb: 1 }}>Sent</Typography>
+              <Typography sx={{ fontSize: 32, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{stats.sent}</Typography>
+              <Typography sx={{ fontSize: 12, color: '#6B7C93', mt: 1 }}>Awaiting Signature</Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ p: 2.5, borderRadius: 2, borderTop: '4px solid #10B981' }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#6B7C93', textTransform: 'uppercase', mb: 1 }}>Signed</Typography>
+              <Typography sx={{ fontSize: 32, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{stats.signed}</Typography>
+              <Typography sx={{ fontSize: 12, color: '#6B7C93', mt: 1 }}>Completed</Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ p: 2.5, borderRadius: 2, borderTop: '4px solid #6366F1' }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#6B7C93', textTransform: 'uppercase', mb: 1 }}>Total Issued</Typography>
+              <Typography sx={{ fontSize: 32, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{stats.total}</Typography>
+              <Typography sx={{ fontSize: 12, color: '#6B7C93', mt: 1 }}>LOIs Processed</Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ p: 2.5, borderRadius: 2, borderTop: '4px solid #3B82F6' }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#6B7C93', textTransform: 'uppercase', mb: 1 }}>Conversion</Typography>
+              <Typography sx={{ fontSize: 32, fontWeight: 800, color: '#111827', lineHeight: 1 }}>{stats.total ? Math.round((stats.signed / stats.total) * 100) : 0}%</Typography>
+              <Typography sx={{ fontSize: 12, color: '#6B7C93', mt: 1 }}>Sign Rate</Typography>
+            </Card>
+          </Grid>
+        </Grid>
 
-        <div className="panel">
-          <div className="panel-hd">
-            <span className="panel-title">Track Letter of Intent Issuance</span>
-          </div>
-          <div className="panel-body" style={{ padding: 0 }}>
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th style={{ paddingLeft: 24 }}>Candidate</th>
-                  <th>Requirement</th>
-                  <th>Sent At</th>
-                  <th>Signed At</th>
-                  <th>Status</th>
-                  <th style={{ paddingRight: 24, textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+        <Card sx={{ borderRadius: 2 }}>
+          <Box sx={{ p: '16px 20px', borderBottom: '1px solid #E5EBF0' }}>
+            <Typography sx={{ fontSize: 16, fontWeight: 600 }}>Track Letter of Intent Issuance</Typography>
+          </Box>
+          <Box sx={{ width: '100%', overflowX: 'auto' }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', pl: 3 }}>Candidate</TableCell>
+                  <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Requirement</TableCell>
+                  <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Sent At</TableCell>
+                  <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Signed At</TableCell>
+                  <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Status</TableCell>
+                  <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase', pr: 3 }} align="right">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
                 {lois.map((loi) => {
                   const candidate = candidates.find((c) => c.id === loi.candidateId);
                   const req = requirements.find((r) => r.id === loi.requirementId);
                   return (
-                    <tr key={loi.id}>
-                      <td style={{ paddingLeft: 24 }}>
-                        <div style={{ fontWeight: 600, color: 'var(--navy)' }}>{candidate?.name || loi.candidateId}</div>
-                        <div style={{ fontSize: 11, color: 'var(--g500)' }}>{candidate?.email}</div>
-                      </td>
-                      <td>
-                        <div style={{ fontFamily: 'monospace', fontWeight: 600, fontSize: 12, color: 'var(--blue)' }}>
+                    <TableRow key={loi.id} hover>
+                      <TableCell sx={{ pl: 3 }}>
+                        <Typography sx={{ fontWeight: 600, color: '#111827', fontSize: 14 }}>{candidate?.name || loi.candidateId}</Typography>
+                        <Typography sx={{ fontSize: 12, color: '#6B7C93' }}>{candidate?.email}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography sx={{ fontFamily: 'monospace', fontWeight: 600, fontSize: 13, color: '#2563EB' }}>
                           {req?.requirementCode || loi.requirementId}
-                        </div>
-                      </td>
-                      <td>{formatDate(loi.sentAt)}</td>
-                      <td>{loi.signedAt ? formatDate(loi.signedAt) : '—'}</td>
-                      <td>
-                        <span className={`badge ${loi.status === 'Signed' ? 'loi' : 'active'}`}>
-                          {loi.status}
-                        </span>
-                      </td>
-                      <td style={{ paddingRight: 24, textAlign: 'right' }}>
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ fontSize: 14 }}>{formatDate(loi.sentAt)}</TableCell>
+                      <TableCell sx={{ fontSize: 14 }}>{loi.signedAt ? formatDate(loi.signedAt) : '—'}</TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={loi.status} 
+                          size="small" 
+                          sx={{ 
+                            bgcolor: loi.status === 'Signed' ? '#E0E7FF' : '#DCFCE7', 
+                            color: loi.status === 'Signed' ? '#3730A3' : '#166534', 
+                            fontWeight: 600, 
+                            borderRadius: 1 
+                          }} 
+                        />
+                      </TableCell>
+                      <TableCell sx={{ pr: 3 }} align="right">
                         {canIssue && loi.status === 'Sent' && (
-                          <button
-                            className="btn btn-ghost btn-sm"
+                          <Button
+                            size="small"
+                            variant="text"
+                            color="success"
                             onClick={() => handleMarkSigned(loi.id)}
-                            style={{ color: 'var(--green)' }}
+                            sx={{ fontWeight: 600 }}
                           >
-                            <i className="ti ti-check" /> Mark Signed
-                          </button>
+                            <i className="ti ti-check" style={{ marginRight: 6 }} /> Mark Signed
+                          </Button>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
                 {lois.length === 0 && (
-                  <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '60px 0', color: 'var(--g500)' }}>
-                      <div style={{ fontSize: 34, opacity: 0.2, marginBottom: 10 }}><i className="ti ti-mail-forward" /></div>
-                      No LOIs issued yet
-                    </td>
-                  </tr>
+                  <TableRow>
+                    <TableCell colSpan={6} sx={{ textAlign: 'center', py: 8, color: '#6B7C93' }}>
+                      <Box sx={{ fontSize: 40, opacity: 0.2, mb: 1 }}><i className="ti ti-mail-forward" /></Box>
+                      <Typography sx={{ fontSize: 14 }}>No LOIs issued yet</Typography>
+                    </TableCell>
+                  </TableRow>
                 )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+              </TableBody>
+            </Table>
+          </Box>
+        </Card>
+      </Box>
 
-      {open && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: 600 }}>
-            <div className="modal-hd">
-              <span className="modal-title">Issue LOI</span>
-              <button className="btn-close" onClick={() => setOpen(false)}>×</button>
-            </div>
-            <div className="modal-body" style={{ padding: 0 }}>
-              <div style={{ padding: 20, background: 'var(--g50)', borderBottom: '1px solid var(--g200)' }}>
-                <label className="form-label">Step 1: Select Requirement</label>
-                <select 
-                  className="form-input" 
-                  value={bulkReqId} 
-                  onChange={e => setBulkReqId(e.target.value)}
-                >
-                  <option value="">Choose requirement...</option>
-                  {requirements.filter(r => r.status === 'active').map(r => (
-                    <option key={r.id} value={r.id}>{r.requirementCode} ({r.location})</option>
-                  ))}
-                </select>
-              </div>
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 2 } }}>
+        <DialogTitle sx={{ borderBottom: '1px solid #E5EBF0', pb: 2 }}>
+          <Typography sx={{ fontSize: 18, fontWeight: 600 }}>Issue LOI</Typography>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          <Box sx={{ p: 2.5, bgcolor: '#F8FAFC', borderBottom: '1px solid #E5EBF0' }}>
+            <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 1.5 }}>Step 1: Select Requirement</Typography>
+            <FormControl fullWidth size="small">
+              <InputLabel>Choose requirement...</InputLabel>
+              <Select label="Choose requirement..." value={bulkReqId} onChange={e => setBulkReqId(e.target.value)}>
+                <MenuItem value=""><em>None</em></MenuItem>
+                {requirements.filter(r => r.status === 'active').map(r => (
+                  <MenuItem key={r.id} value={r.id}>{r.requirementCode} ({r.location})</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
 
-              <div style={{ padding: 20 }}>
-                <label className="form-label" style={{ marginBottom: 12 }}>Step 2: Select Candidates ({eligibleCandidates.length} eligible)</label>
-                <div style={{ maxHeight: 300, overflowY: 'auto' }} className="custom-scroll">
-                  {eligibleCandidates.length > 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {eligibleCandidates.map(c => (
-                        <div 
-                          key={c.id} 
-                          className="disc-card" 
-                          style={{ 
-                            padding: '10px 15px', 
-                            cursor: 'pointer',
-                            border: selectedCandidates.includes(c.id) ? '1px solid var(--blue)' : '1px solid var(--g200)',
-                            background: selectedCandidates.includes(c.id) ? 'rgba(10,132,208,0.05)' : '#fff'
-                          }}
-                          onClick={() => toggleCandidate(c.id)}
-                        >
-                          <input 
-                            type="checkbox" 
-                            checked={selectedCandidates.includes(c.id)} 
-                            onChange={() => {}} // Controlled by div click
-                            style={{ width: 16, height: 16, cursor: 'pointer' }}
-                          />
-                          <div style={{ flex: 1, marginLeft: 10 }}>
-                            <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--navy)' }}>{c.name}</div>
-                            <div style={{ fontSize: 12, color: 'var(--g500)' }}>{c.stream} • {c.email}</div>
-                          </div>
-                          <div className="badge active" style={{ fontSize: 11 }}>Discussed</div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div style={{ textAlign: 'center', padding: '20px', color: 'var(--g500)', fontSize: 14 }}>
-                      No candidates in 'Discussed' status. Run discussions first.
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="modal-ft">
-              <button className="btn btn-ghost" onClick={() => setOpen(false)}>Cancel</button>
-              <button 
-                className="btn btn-primary" 
-                disabled={creating || selectedCandidates.length === 0 || !bulkReqId}
-                onClick={handleBulkSend}
-              >
-                {creating ? 'Sending...' : `Issue LOI to ${selectedCandidates.length} candidates`}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          <Box sx={{ p: 2.5 }}>
+            <Typography sx={{ fontSize: 14, fontWeight: 600, mb: 1.5 }}>
+              Step 2: Select Candidates ({eligibleCandidates.length} eligible)
+            </Typography>
+            <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
+              {eligibleCandidates.length > 0 ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {eligibleCandidates.map(c => {
+                    const isSelected = selectedCandidates.includes(c.id);
+                    return (
+                      <Box 
+                        key={c.id} 
+                        onClick={() => toggleCandidate(c.id)}
+                        sx={{ 
+                          p: '10px 15px', 
+                          cursor: 'pointer',
+                          border: '1px solid',
+                          borderColor: isSelected ? 'primary.main' : '#E5EBF0',
+                          bgcolor: isSelected ? 'primary.50' : '#fff',
+                          borderRadius: 1.5,
+                          display: 'flex',
+                          alignItems: 'center',
+                          transition: 'all 0.15s'
+                        }}
+                      >
+                        <Checkbox 
+                          checked={isSelected} 
+                          onChange={() => {}} 
+                          size="small" 
+                          sx={{ p: 0, mr: 1.5 }}
+                        />
+                        <Box sx={{ flex: 1 }}>
+                          <Typography sx={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{c.name}</Typography>
+                          <Typography sx={{ fontSize: 12, color: '#6B7C93' }}>{c.stream} • {c.email}</Typography>
+                        </Box>
+                        <Chip label="Discussed" size="small" sx={{ fontSize: 11, bgcolor: '#E0F2FE', color: '#0284C7', fontWeight: 600, borderRadius: 1 }} />
+                      </Box>
+                    );
+                  })}
+                </Box>
+              ) : (
+                <Typography sx={{ textAlign: 'center', p: 3, color: '#6B7C93', fontSize: 14 }}>
+                  No candidates in 'Discussed' status. Run discussions first.
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #E5EBF0' }}>
+          <Button onClick={() => setOpen(false)} color="inherit">Cancel</Button>
+          <LoadingButton 
+            variant="contained" 
+            color="primary"
+            disabled={creating || selectedCandidates.length === 0 || !bulkReqId}
+            onClick={handleBulkSend}
+            loading={creating}
+          >
+            Issue LOI to {selectedCandidates.length} candidates
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

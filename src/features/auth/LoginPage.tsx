@@ -39,7 +39,8 @@ export const LoginPage: React.FC = () => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         setCurrentUser(data.user);
-        navigate('/dashboard');
+        const defaultRoute = data.user.role === 'ACCOUNT_MANAGER' ? '/mandates' : '/dashboard';
+        navigate(defaultRoute);
       } else {
         setError(data.message || 'Login failed');
       }
@@ -67,7 +68,8 @@ export const LoginPage: React.FC = () => {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         setCurrentUser(data.user);
-        navigate('/dashboard');
+        const defaultRoute = data.user.role === 'ACCOUNT_MANAGER' ? '/mandates' : '/dashboard';
+        navigate(defaultRoute);
       } else {
         setError(data.message || 'Google login failed');
       }

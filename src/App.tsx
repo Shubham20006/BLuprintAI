@@ -64,11 +64,13 @@ const RoleGuard: React.FC<{ allowedRoles: UserRole[]; children: React.ReactNode 
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 const AppRoutes: React.FC = () => {
-  const { isAuthenticated } = useSessionStore();
+  const { isAuthenticated, currentUser } = useSessionStore();
+  const defaultRoute = currentUser?.role === 'ACCOUNT_MANAGER' ? '/mandates' : '/dashboard';
+
   return (
     <Routes>
       {/* Public */}
-      <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+      <Route path="/login" element={isAuthenticated ? <Navigate to={defaultRoute} replace /> : <LoginPage />} />
 
       {/* All authenticated roles */}
       <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
@@ -147,7 +149,7 @@ const AppRoutes: React.FC = () => {
       } />
 
       {/* Fallback */}
-      <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
+      <Route path="/" element={<Navigate to={isAuthenticated ? defaultRoute : '/login'} replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

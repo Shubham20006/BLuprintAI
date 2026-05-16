@@ -2,6 +2,31 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableHead,
+  TextField,
+  InputAdornment,
+  LinearProgress,
+  Chip,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Checkbox
+} from '@mui/material';
+import {
   useMappings, useRequirements, useCandidates, useCOEs,
   useCreateMapping, useUpdateMapping, useMappingLineItems,
   useCreateMappingLineItem, useCreateApproval, useApprovals,
@@ -129,203 +154,225 @@ export const MappingsPage: React.FC = () => {
 
   return (
     <>
-      <div className="topbar">
-        <div className="topbar-left">
-          <span className="breadcrumb">Mappings / <span>Overview</span></span>
-        </div>
-        <div className="topbar-right">
+      <Box sx={{ bgcolor: '#fff', borderBottom: '1px solid #E5EBF0', px: 2, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+          <Typography sx={{ fontSize: 15, color: '#6B7C93' }}>
+            Mappings / <Box component="span" sx={{ color: '#111827', fontWeight: 500 }}>Overview</Box>
+          </Typography>
+        </Box>
+        <Box>
           {canCreate && (
-            <button className="btn btn-primary btn-sm" onClick={() => setNewOpen(true)}>
-              <i className="ti ti-plus" aria-hidden="true" /> New Mapping
-            </button>
+            <Button variant="contained" color="primary" onClick={() => setNewOpen(true)}>
+              <i className="ti ti-plus" style={{ marginRight: 6 }} /> New Mapping
+            </Button>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
-      <div className="content">
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 26, fontWeight: 700, color: 'var(--navy)', marginBottom: 4 }}>Mappings</div>
-          <div style={{ fontSize: 14, color: 'var(--g500)' }}>{mappings.length} total mapping records</div>
-        </div>
+      <Box sx={{ p: 3 }}>
+        <Box sx={{ mb: 3 }}>
+          <Typography sx={{ fontSize: 26, fontWeight: 700, color: '#111827', mb: 0.5 }}>Mappings</Typography>
+          <Typography sx={{ fontSize: 14, color: '#6B7C93' }}>{mappings.length} total mapping records</Typography>
+        </Box>
 
-        <div className="panel">
-          <div className="panel-body" style={{ padding: 20 }}>
-            <div style={{ marginBottom: 20, maxWidth: 400 }}>
-              <div className="form-group" style={{ margin: 0, position: 'relative' }}>
-                <i className="ti ti-search" style={{ position: 'absolute', left: 12, top: 10, color: 'var(--g500)' }} />
-                <input 
-                  type="text" 
-                  className="form-input" 
-                  placeholder="Search by requirement or status..." 
-                  value={search} 
-                  onChange={(e) => setSearch(e.target.value)}
-                  style={{ paddingLeft: 36 }}
-                />
-              </div>
-            </div>
+        <Card sx={{ borderRadius: 2 }}>
+          <Box sx={{ p: 2 }}>
+            <Box sx={{ mb: 2, width: 400 }}>
+              <TextField
+                size="small"
+                fullWidth
+                placeholder="Search by requirement or status..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <i className="ti ti-search" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
 
-            <div style={{ overflowX: 'auto' }}>
+            <Box sx={{ width: '100%', overflowX: 'auto' }}>
               {isLoading ? (
-                <PageLoader message="Loading mappings..." />
+                <Box sx={{ p: 4 }}><LinearProgress /></Box>
               ) : (
-                <table className="tbl">
-                  <thead>
-                    <tr>
-                      <th>Requirement</th>
-                      <th>Status</th>
-                      <th>Created</th>
-                      <th>Updated</th>
-                      <th>Notes</th>
-                      <th style={{ textAlign: 'right' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Requirement</TableCell>
+                      <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Status</TableCell>
+                      <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Created</TableCell>
+                      <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Updated</TableCell>
+                      <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }}>Notes</TableCell>
+                      <TableCell sx={{ color: '#6B7C93', fontWeight: 600, fontSize: 12, textTransform: 'uppercase' }} align="right">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
                     {filtered.map((m) => {
                       const req = requirements.find((r) => r.id === m.requirementId);
                       return (
-                        <tr key={m.id}>
-                          <td>
-                            <div style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, color: 'var(--navy)' }}>
+                        <TableRow key={m.id} hover>
+                          <TableCell>
+                            <Typography sx={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, color: '#111827' }}>
                               {req?.requirementCode || m.requirementId}
-                            </div>
-                          </td>
-                          <td>
-                            <span className={`badge ${m.status === 'Draft' ? 'draft' : 'active'}`}>{m.status}</span>
-                          </td>
-                          <td style={{ fontSize: 13, color: 'var(--g600)' }}>{formatDate(m.createdAt)}</td>
-                          <td style={{ fontSize: 13, color: 'var(--g600)' }}>{formatDate(m.updatedAt)}</td>
-                          <td style={{ fontSize: 13, color: 'var(--g500)', maxWidth: 160, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip 
+                              label={m.status} 
+                              size="small" 
+                              sx={{ 
+                                bgcolor: m.status === 'Draft' ? '#FEF9C3' : '#E0E7FF', 
+                                color: m.status === 'Draft' ? '#854D0E' : '#3730A3', 
+                                fontWeight: 600, 
+                                borderRadius: 1 
+                              }} 
+                            />
+                          </TableCell>
+                          <TableCell sx={{ fontSize: 13, color: '#475569' }}>{formatDate(m.createdAt)}</TableCell>
+                          <TableCell sx={{ fontSize: 13, color: '#475569' }}>{formatDate(m.updatedAt)}</TableCell>
+                          <TableCell sx={{ fontSize: 13, color: '#6B7C93', maxWidth: 160, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {m.notes || '—'}
-                          </td>
-                          <td style={{ textAlign: 'right' }}>
-                            <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/mappings/${m.id}`)}>
-                              <i className="ti ti-eye" aria-hidden="true" />
-                            </button>
-                            {currentUser && (
-                              (m.status === 'Draft' && can.submitMapping(currentUser.role)) ||
-                              (m.status === 'Engineering Review' && can.engineeringApprove(currentUser.role)) ||
-                              (m.status === 'Approved by Eng' && can.misConfirm(currentUser.role))
-                            ) && (
-                              <button className="btn btn-ghost btn-sm" style={{ color: 'var(--blue)' }} onClick={() => handleAdvanceStatus(m)} title="Advance Status">
-                                <i className="ti ti-arrow-right" aria-hidden="true" />
-                              </button>
-                            )}
-                          </td>
-                        </tr>
+                          </TableCell>
+                          <TableCell align="right">
+                            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                              <IconButton size="small" onClick={() => navigate(`/mappings/${m.id}`)}>
+                                <i className="ti ti-eye" style={{ fontSize: 18 }} />
+                              </IconButton>
+                              {currentUser && (
+                                (m.status === 'Draft' && can.submitMapping(currentUser.role)) ||
+                                (m.status === 'Engineering Review' && can.engineeringApprove(currentUser.role)) ||
+                                (m.status === 'Approved by Eng' && can.misConfirm(currentUser.role))
+                              ) && (
+                                <IconButton size="small" sx={{ color: 'primary.main' }} onClick={() => handleAdvanceStatus(m)} title="Advance Status">
+                                  <i className="ti ti-arrow-right" style={{ fontSize: 18 }} />
+                                </IconButton>
+                              )}
+                            </Box>
+                          </TableCell>
+                        </TableRow>
                       );
                     })}
                     {!isLoading && filtered.length === 0 && (
-                      <tr>
-                        <td colSpan={6} style={{ textAlign: 'center', padding: 30, color: 'var(--g500)' }}>
+                      <TableRow>
+                        <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4, color: '#6B7C93' }}>
                           No mappings found
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     )}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               )}
-            </div>
-          </div>
-        </div>
-      </div>
+            </Box>
+          </Box>
+        </Card>
+      </Box>
 
-      {/* Custom Modal for New Mapping */}
-      {newOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: 700 }}>
-            <div className="modal-hd">
-              <span className="modal-title">Create Mapping Proposal</span>
-              <button className="btn-close" onClick={() => setNewOpen(false)}>×</button>
-            </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label className="form-label">Select Requirement</label>
-                <select className="form-select" value={selectedReqId} onChange={(e) => setSelectedReqId(e.target.value)}>
-                  <option value="" disabled>Select a requirement</option>
-                  {requirements.filter((r) => r.status === 'active').map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.requirementCode} — {r.openPositions - r.filledPositions} open
-                    </option>
-                  ))}
-                </select>
-              </div>
+      <Dialog open={newOpen} onClose={() => setNewOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 2 } }}>
+        <DialogTitle sx={{ borderBottom: '1px solid #E5EBF0', pb: 2 }}>
+          <Typography sx={{ fontSize: 18, fontWeight: 600 }}>Create Mapping Proposal</Typography>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Box sx={{ mb: 3 }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Select Requirement</InputLabel>
+              <Select label="Select Requirement" value={selectedReqId} onChange={(e) => setSelectedReqId(e.target.value)}>
+                <MenuItem value="" disabled>Select a requirement</MenuItem>
+                {requirements.filter((r) => r.status === 'active').map((r) => (
+                  <MenuItem key={r.id} value={r.id}>
+                    {r.requirementCode} — {r.openPositions - r.filledPositions} open
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
 
-              {requirement && (
-                <div style={{ background: remainingCap > 0 ? 'var(--blue-light)' : '#FEE2E2', color: remainingCap > 0 ? 'var(--blue)' : '#B91C1C', padding: '8px 12px', borderRadius: 6, fontSize: 13, marginBottom: 16 }}>
-                  {remainingCap > 0 ? `${remainingCap} of ${requirement.openPositions} positions available` : 'This requirement is at full capacity'}
-                </div>
-              )}
+          {requirement && (
+            <Box sx={{ background: remainingCap > 0 ? '#E0F2FE' : '#FEE2E2', color: remainingCap > 0 ? '#0284C7' : '#B91C1C', padding: '8px 12px', borderRadius: 1.5, fontSize: 13, mb: 3 }}>
+              {remainingCap > 0 ? `${remainingCap} of ${requirement.openPositions} positions available` : 'This requirement is at full capacity'}
+            </Box>
+          )}
 
-              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--navy)', marginBottom: 8 }}>
-                Select Candidates ({selectedCandidateIds.length} selected)
-              </div>
-              <div style={{ border: '1px solid var(--g300)', borderRadius: 6, maxHeight: 250, overflowY: 'auto', marginBottom: 16 }}>
-                <table className="tbl" style={{ border: 'none' }}>
-                  <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: 'var(--g50)' }}>
-                    <tr>
-                      <th style={{ width: 30 }}></th>
-                      <th>Name</th>
-                      <th>COE</th>
-                      <th>Availability</th>
-                      <th>CGPA</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredCandidates
-                      .filter((c) => ['Selected','Proposed'].includes(c.status) || (currentUser?.role === 'MIS_MANAGER' && c.status === 'Mapped'))
-                      .map((c) => {
-                        const coe = coes.find((co) => Number(co.id) === Number(c.coeId));
-                        const checked = selectedCandidateIds.includes(c.id);
-                        const dateMisaligned = requirement && c.availabilityDate > requirement.onboardingDate;
-                        return (
-                          <tr 
-                            key={c.id} 
-                            style={{ 
-                              cursor: 'pointer', 
-                              background: checked ? 'var(--blue-light)' : 'transparent',
-                              opacity: (c.status === 'Mapped' && currentUser?.role !== 'MIS_MANAGER') ? 0.5 : 1
-                            }} 
-                            onClick={() => {
-                              if (c.status === 'Mapped' && currentUser?.role !== 'MIS_MANAGER') return;
-                              setSelectedCandidateIds((prev) => checked ? prev.filter((id) => id !== c.id) : [...prev, c.id]);
-                            }}
-                          >
-                            <td style={{ textAlign: 'center' }}>
-                              <input type="checkbox" checked={checked} readOnly style={{ cursor: 'pointer' }} disabled={c.status === 'Mapped' && currentUser?.role !== 'MIS_MANAGER'} />
-                            </td>
-                            <td style={{ fontSize: 13, fontWeight: 600, color: 'var(--navy)' }}>
-                              {c.name}
-                              {c.status === 'Mapped' && <div style={{ fontSize: 10, color: 'var(--red)', fontWeight: 700 }}>CONFLICT</div>}
-                            </td>
-                            <td style={{ fontSize: 13, fontWeight: 500, color: 'var(--navy)' }}>{coe?.name?.split(' ')[0] || 'N/A'}</td>
-                            <td style={{ fontSize: 13, color: dateMisaligned ? 'var(--red)' : 'var(--navy)', fontWeight: dateMisaligned ? 700 : 500 }}>
-                              {c.availabilityDate}
-                              {dateMisaligned && <i className="ti ti-alert-triangle" style={{ marginLeft: 4 }} title="After onboarding date" />}
-                            </td>
-                            <td style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)' }}>{c.cgpa}</td>
-                            <td><span className={`badge ${c.status === 'Mapped' ? 'active' : 'draft'}`} style={{ fontSize: 11 }}>{c.status}</span></td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
+          <Typography sx={{ fontSize: 14, fontWeight: 700, color: '#111827', mb: 1 }}>
+            Select Candidates ({selectedCandidateIds.length} selected)
+          </Typography>
+          <Box sx={{ border: '1px solid #CBD5E1', borderRadius: 1.5, maxHeight: 250, overflowY: 'auto', mb: 3 }}>
+            <Table size="small" stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ width: 30, bgcolor: '#F8FAFC' }}></TableCell>
+                  <TableCell sx={{ bgcolor: '#F8FAFC' }}>Name</TableCell>
+                  <TableCell sx={{ bgcolor: '#F8FAFC' }}>COE</TableCell>
+                  <TableCell sx={{ bgcolor: '#F8FAFC' }}>Availability</TableCell>
+                  <TableCell sx={{ bgcolor: '#F8FAFC' }}>CGPA</TableCell>
+                  <TableCell sx={{ bgcolor: '#F8FAFC' }}>Status</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredCandidates
+                  .filter((c) => ['Selected','Proposed'].includes(c.status) || (currentUser?.role === 'MIS_MANAGER' && c.status === 'Mapped'))
+                  .map((c) => {
+                    const coe = coes.find((co) => Number(co.id) === Number(c.coeId));
+                    const checked = selectedCandidateIds.includes(c.id);
+                    const dateMisaligned = requirement && c.availabilityDate > requirement.onboardingDate;
+                    return (
+                      <TableRow 
+                        key={c.id} 
+                        hover
+                        sx={{ 
+                          cursor: 'pointer', 
+                          bgcolor: checked ? '#E0F2FE' : 'transparent',
+                          opacity: (c.status === 'Mapped' && currentUser?.role !== 'MIS_MANAGER') ? 0.5 : 1
+                        }} 
+                        onClick={() => {
+                          if (c.status === 'Mapped' && currentUser?.role !== 'MIS_MANAGER') return;
+                          setSelectedCandidateIds((prev) => checked ? prev.filter((id) => id !== c.id) : [...prev, c.id]);
+                        }}
+                      >
+                        <TableCell sx={{ textAlign: 'center', py: 0.5 }}>
+                          <Checkbox checked={checked} disabled={c.status === 'Mapped' && currentUser?.role !== 'MIS_MANAGER'} size="small" />
+                        </TableCell>
+                        <TableCell sx={{ py: 0.5 }}>
+                          <Typography sx={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                            {c.name}
+                          </Typography>
+                          {c.status === 'Mapped' && <Typography sx={{ fontSize: 10, color: '#DC2626', fontWeight: 700 }}>CONFLICT</Typography>}
+                        </TableCell>
+                        <TableCell sx={{ py: 0.5 }}>
+                          <Typography sx={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{coe?.name?.split(' ')[0] || 'N/A'}</Typography>
+                        </TableCell>
+                        <TableCell sx={{ py: 0.5 }}>
+                          <Typography sx={{ fontSize: 13, color: dateMisaligned ? '#DC2626' : '#111827', fontWeight: dateMisaligned ? 700 : 500, display: 'flex', alignItems: 'center' }}>
+                            {c.availabilityDate}
+                            {dateMisaligned && <i className="ti ti-alert-triangle" style={{ marginLeft: 4 }} title="After onboarding date" />}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ py: 0.5 }}>
+                          <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#16A34A' }}>{c.cgpa}</Typography>
+                        </TableCell>
+                        <TableCell sx={{ py: 0.5 }}>
+                          <Chip label={c.status} size="small" sx={{ fontSize: 11, bgcolor: c.status === 'Mapped' ? '#DCFCE7' : '#F1F5F9', color: c.status === 'Mapped' ? '#166534' : '#475569', fontWeight: 600, borderRadius: 1 }} />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </Box>
 
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label">Notes</label>
-                <textarea className="form-input" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any specific notes..."></textarea>
-              </div>
-            </div>
-            <div className="modal-ft">
-              <button className="btn btn-ghost" onClick={() => setNewOpen(false)}>Cancel</button>
-              <LoadingButton loading={creating} onClick={handleSubmitMapping}>
-                Create Draft Mapping
-              </LoadingButton>
-            </div>
-          </div>
-        </div>
-      )}
+          <Box>
+            <TextField fullWidth label="Notes" size="small" multiline rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any specific notes..." />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #E5EBF0' }}>
+          <Button onClick={() => setNewOpen(false)} color="inherit">Cancel</Button>
+          <LoadingButton onClick={handleSubmitMapping} loading={creating} variant="contained" color="primary">
+            Create Draft Mapping
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
